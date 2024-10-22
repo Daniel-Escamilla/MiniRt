@@ -1,0 +1,17 @@
+# Luz ambiental    intensidad    RGB
+A                     0.2    255,255,255
+
+# Cámara    X Y Z      orientación X Y Z        FOV
+C 		-50.0,0.0,20.0   0.0,0.0,1.0             70
+
+# Luz    X Y Z       brillo    RGB
+L 	-40.0,50.0,0.0 	   0.6       10,0,255
+
+# Esfera    X Y Z       diámetro    RGB
+sp		0.0,0.0,20.6   	 12.6     10,0,255
+
+# Plano    X Y Z        normal X Y Z       RGB
+pl       0.0,0.0,-10.0   0.0,1.0,0.0     0,0,225
+
+# Cilindro    X Y Z      normal X Y Z   diámetro   altura    RGB
+cy        50.0,0.0,20.6   0.0,0.0,1.0     14.2     21.42   10,0,255

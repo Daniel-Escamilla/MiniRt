@@ -66,7 +66,7 @@ fclean: clean
 
 re: fclean all
 
-run: $(NAME)
-	./$(NAME)
+run: Z_To-Do_Z/To-Do.py
+	python3 Z_To-Do_Z/To-Do.py
 
 .PHONY: all clean fclean re libft run mlx

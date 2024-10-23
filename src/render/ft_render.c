@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/23 23:46:18 by descamil         ###   ########.fr       */
+/*   Updated: 2024/10/23 23:49:49 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ uint32_t	ft_per_pixel(t_image *image, t_vec2 coord)
 		// printf("%f\n", result);
 		// printf("Coord.x --> %f\n", coord.x);
 		// printf("Coord.y --> %f\n", coord.y);
+		printf("Result.x --> %f\n", result.x);
+		printf("Result.y --> %f\n", result.y);
 	}
 	else
 		color = 0x00000000;

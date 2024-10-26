@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:37:52 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/21 14:42:37 by descamil         ###   ########.fr       */
+/*   Updated: 2024/10/25 22:40:09 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,6 @@
 # include "../minirt.h"
 
 // ft_hooks.c
-int ft_key_hook(int key, t_image *data);
+int ft_key_hook(int key, t_image *image);
 
 #endif

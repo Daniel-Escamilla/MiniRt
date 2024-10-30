@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/26 23:38:40 by descamil         ###   ########.fr       */
+/*   Updated: 2024/10/30 16:00:33 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ typedef struct
 // 	float	a;
 // } 		t_vec4;
 
+
+
 typedef struct s_keys
 {
 	int		w;
@@ -92,19 +94,13 @@ typedef struct s_color
 	int			plus;
 }				t_color;
 
-typedef struct s_circle
-{
-	float		radius;
-}				t_circle;
-
-typedef struct	s_mlx
-{
-	void		*img;
-	char		*addr;
-	int			bits_per_pixel;
-	int			line_length;
-	int			endian;
-}				t_mlx;
+typedef struct s_sphere
+{ 
+	t_vec3			position;
+	float			radius;
+	t_vec3			color;
+	struct s_sphere	*next;
+}					t_sphere;
 
 typedef struct	s_light
 {
@@ -115,19 +111,22 @@ typedef struct	s_light
 
 typedef struct s_camera
 {
-    t_vec3		position;
-    t_vec3		front;
-    t_vec3		up;
-    t_vec3		right;
-    t_vec3		world_up;
-    float		yaw;
-    float		pitch;
+	float		fov;
 } t_camera;
+
+typedef struct	s_mlx
+{
+	void		*img;
+	char		*addr;
+	int			bits_per_pixel;
+	int			line_length;
+	int			endian;
+}				t_mlx;
 
 typedef struct s_image
 {
 	t_mlx		*data;
-	t_circle	*circle;
+	t_sphere	*sphere;
 	t_color		*color;
 	t_light		*light;
 	t_camera	*camera;

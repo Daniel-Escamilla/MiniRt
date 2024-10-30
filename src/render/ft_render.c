@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/26 23:04:42 by descamil         ###   ########.fr       */
+/*   Updated: 2024/10/30 19:45:09 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,23 +145,6 @@ float	ft_max(float a, float b)
 	return (0.0f);
 }
 
-t_vec3	ft_per_pixel(t_image *image, t_vec2 coord)
-{
-	t_vec3		ray_dir;		// a
-	t_vec3		ray_origin;		// b
-	float		discriminat;
-	float		a;
-	float		b;
-	float		c;
-
-	
-	coord.x *= image->aspect_ratio;
-	
-
-	ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
-	ray_origin = image->camera->position;
-	// ray_origin = ft_create_vec3(0.0f, 0.0f, 2.0f);
-
 	// ( bx² ​+ by² ​+ bz² ​)t² + 2(ax​bx ​+ ay​by ​+ az​bz​)t + (ax²​ + ay² + az² − r²) = 0
 	// a = ray_direction
 	// b = ray_origin
@@ -172,24 +155,57 @@ t_vec3	ft_per_pixel(t_image *image, t_vec2 coord)
 	// (-b +- sqrt(discriminant)) / 2a
 
 	// radius = 0.5f;
-	a = ft_dot(ray_dir, ray_dir);
-	b = 2.0f * ft_dot(ray_dir, ray_origin);
-	c = ft_dot(ray_origin, ray_origin) - image->circle->radius * image->circle->radius;
+t_vec3	ft_per_pixel(t_image *image, t_vec2 coord)
+{
+	t_vec3		ray_dir;		// a
+	t_vec3		ray_origin;		// b
+	float		a;
+	float		b;
+	float		c;
+	t_vec3		origin;
+	float		closestt;
+	int			found;
+	
+	t_vec3		rgb;
+	coord.x *= image->aspect_ratio;
 
-	discriminat = b * b - 4.0f * a * c;
-	if (discriminat < 0)
+	ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
+	ray_origin = ft_create_vec3(0.0f, 0.0f, 3.0f);
+	closestt = FLT_MAX;
+	found = 0;
+	t_sphere	*current = image->sphere;
+	while (current)
 	{
-		t_vec3 color = ft_create_vec3(0.05f, 0.05f, 0.05f);
-		return (color);
+		t_vec3 test = ft_dotv3(ray_origin, current->position, ft_subtract); 
+	
+		a = ft_dot(ray_dir, ray_dir);
+		b = 2.0f * ft_dot(ray_dir, test);
+		c = ft_dot(test, test) - current->radius * current->radius;
+
+		// float t0 = (-b + sqrt(discriminat)) / (2.0f * a);
+		float disc = b * b - 4.0f * a * c;
+		if (disc >= 0)
+		{
+			float	tt = (-b - sqrt(disc)) / (2.0f * a);
+			if (tt < closestt)
+			{
+				origin = test;
+				closestt = tt;
+				rgb = current->color;
+				found = 1;
+			}
+		}
+		current = current->next;
+		
 	}
-	// float t0 = (-b + sqrt(discriminat)) / (2.0f * a);
-	float	closestt = (-b - sqrt(discriminat)) / (2.0f * a);
+	if (found == 0)
+		return (ft_float_to_vec3(0.0f));
 
 	// Color base sin luz, [Magenta]
 	// color = ft_create_vec3(1.0f, 0.0f, 1.0f);
 	
-	// t_vec3 hit_point = ray_origin + ray_dir * closett; 
-	t_vec3	hit_point = ft_dotv3(ray_origin, ft_dotv3 (ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
+	// t_vec3 hit_point = origin + ray_dir * closett; 
+	t_vec3	hit_point = ft_dotv3(origin, ft_dotv3 (ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
 	
 
 	// Normal, ajusta el rango de valores de -1.0f_1.0f a 0.0f_1.0f
@@ -209,7 +225,7 @@ t_vec3	ft_per_pixel(t_image *image, t_vec2 coord)
 	float	d = ft_max(ft_dot(normal, light_dir), 0.0f);
 
 
-	t_vec3	direcctional_color = ft_dotv3(image->color->rgb, ft_float_to_vec3(d), ft_multiply);
+	t_vec3	direcctional_color = ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply);
 
 	t_vec3 ambient_light = ft_float_to_vec3(0.02f);
 

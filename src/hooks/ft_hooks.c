@@ -6,50 +6,18 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:37:24 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/26 23:31:39 by descamil         ###   ########.fr       */
+/*   Updated: 2024/10/30 18:25:31 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/hooks.h"
 
-void	ft_rgb(int key, t_image *image)
-{
-	if (key == NEG || key == SUBS)
-		image->color->plus = 0;
-	if (key == POS || key == PLUS)
-		image->color->plus = 1;
-
-	if (key == R && image->color->plus == 1)
-		image->color->rgb.x += 0.1f;
-	if (key == G && image->color->plus == 1)
-		image->color->rgb.y += 0.1f;
-	if (key == B && image->color->plus == 1)
-		image->color->rgb.z += 0.1f;
-
-	if (key == T)
-	{
-		if (image->color->rgb.x > 0.0f)
-			image->color->rgb.x -= 0.1f;
-		if (image->color->rgb.y > 0.0f)
-			image->color->rgb.y -= 0.1f;
-		if (image->color->rgb.z > 0.0f)
-			image->color->rgb.z -= 0.1f;
-	}
-	
-	if (key == R && image->color->plus == 0 && image->color->rgb.x > 0.0f)
-		image->color->rgb.x -= 0.1f;
-	if (key == G && image->color->plus == 0 && image->color->rgb.y > 0.0f)
-		image->color->rgb.y -= 0.1f;
-	if (key == B && image->color->plus == 0 && image->color->rgb.z > 0.0f)
-		image->color->rgb.z -= 0.1f;
-}
-
 void	ft_circle(int key, t_image *image)
 {
-	if (key == 65362 && image->circle->radius > 0.0f)
-		image->circle->radius -= 0.01f;
+	if (key == 65362 && image->sphere->radius > 0.0f)
+		image->sphere->radius -= 0.01f;
 	if (key == 65364)
-		image->circle->radius += 0.01f;
+		image->sphere->radius += 0.01f;
 }
 
 void	ft_lights(int key, t_image *image)
@@ -141,11 +109,9 @@ int ft_key_hook(int key, t_image *image)
 	if (key == 65307 || key == 113)
 		ft_end_program(image);
 	ft_circle(key, image);
-	// ft_lights(key, image);
-	// ft_rgb(key, image);
-    if (key != M && key != W && key != A && key != S && key != D)
+	ft_lights(key, image);
+	ft_moon(key, image);
+    if (key != M)
 	    ft_create_render(image->data, image);
-    
-	// ft_moon(key, image);
 	return (0);
 }

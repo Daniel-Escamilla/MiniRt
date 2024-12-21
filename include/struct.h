@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/30 16:00:33 by descamil         ###   ########.fr       */
+/*   Updated: 2024/12/21 20:20:23 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,17 @@ typedef struct s_sphere
 	struct s_sphere	*next;
 }					t_sphere;
 
+typedef struct s_cylinder
+{ 
+	t_vec3				position;
+	float				radius;
+	float				height;
+	t_vec3				color;
+	t_vec3				normal;
+	struct s_cylinder	*next;
+}						t_cylinder;
+
+
 typedef struct	s_light
 {
 	int			count;
@@ -127,6 +138,7 @@ typedef struct s_image
 {
 	t_mlx		*data;
 	t_sphere	*sphere;
+	t_cylinder	*cylinder;
 	t_color		*color;
 	t_light		*light;
 	t_camera	*camera;
@@ -136,7 +148,6 @@ typedef struct s_image
 	int			width;
 	int			height;
 	float		aspect_ratio;
-
 	int			is_pressed;
     int			mouse_x;
     int			mouse_y;

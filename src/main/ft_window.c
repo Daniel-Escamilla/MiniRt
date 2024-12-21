@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:20:29 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/25 23:31:38 by descamil         ###   ########.fr       */
+/*   Updated: 2024/12/21 20:20:24 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 int	ft_end_program(t_image *image)
 {
 	mlx_destroy_window(image->mlx, image->mlx_win);
+	free(image->cylinder);
+	free(image->sphere);
 	exit (0);
 	return (0);
 }

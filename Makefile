@@ -14,7 +14,10 @@ MAIN_SRC =      src/main/ft_main.c \
 
 HOOKS_SRC =		src/hooks/ft_hooks.c \
 
-RENDER_SRC =    src/render/ft_render.c \
+RENDER_SRC =    src/render/ft_maths.c \
+				src/render/ft_dotv3.c \
+				src/render/ft_render.c \
+				src/render/ft_cylinder.c \
 
 # Archivos fuente
 SRCS = 	$(MAIN_SRC) \

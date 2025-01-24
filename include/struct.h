@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2024/12/21 20:20:23 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:16:26 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,10 +89,16 @@ typedef struct s_keys
 
 typedef struct s_color
 {
-	t_vec3		rgb;// red = x // green = y // blue = z
+	t_vec3		rgb;
 	t_vec3		light_dir;
 	int			plus;
 }				t_color;
+
+typedef struct	s_ambient
+{
+	float		ratio;
+	t_vec3		rgb;
+}				t_ambient;
 
 typedef struct s_sphere
 { 
@@ -112,6 +118,13 @@ typedef struct s_cylinder
 	struct s_cylinder	*next;
 }						t_cylinder;
 
+typedef struct	s_plane
+{
+	t_vec3			position;
+	t_vec3			normal;
+	t_vec3			color;
+	struct s_plane	*next;
+}				t_plane;
 
 typedef struct	s_light
 {
@@ -139,6 +152,8 @@ typedef struct s_image
 	t_mlx		*data;
 	t_sphere	*sphere;
 	t_cylinder	*cylinder;
+	t_plane		*plane;
+	t_ambient	*ambient;
 	t_color		*color;
 	t_light		*light;
 	t_camera	*camera;

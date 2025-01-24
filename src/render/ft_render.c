@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2024/12/21 20:20:15 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/24 15:48:16 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,112 +37,6 @@ uint32_t	ft_convert_rgba(t_vec3 color)
 	g = (uint8_t)(color.y * 255.0f);
 	b = (uint8_t)(color.z * 255.0f);
 	return ((r << 16) | (g << 8) | b);
-}
-
-t_vec3	ft_clamp(t_vec3 color)
-{
-	if (color.x < 0.0f)
-		color.x = 0.0f;
-	else if (color.x > 1.0f)
-		color.x = 1.0f;
-
-	if (color.y < 0.0f)
-		color.y = 0.0f;
-	else if (color.y > 1.0f)
-		color.y = 1.0f;
-
-	if (color.z < 0.0f)
-		color.z = 0.0f;
-	else if (color.z > 1.0f)
-		color.z = 1.0f;
-
-	return (color);
-}
-
-float	ft_add(float a, float b)
-{
-	return (a + b);
-}
-
-float	ft_subtract(float a, float b)
-{
-	return (a - b);
-}
-
-float	ft_multiply(float a, float b)
-{
-	return (a * b);
-}
-
-float	ft_divide(float a, float b)
-{
-	if (b != 0)
-		return (a / b);
-	return (0);
-}
-
-t_vec3	ft_create_vec3(float a, float b, float c)
-{
-	t_vec3	result;
-
-	result.x = a;
-	result.y = b;
-	result.z = c;
-	return (result);
-}
-
-t_vec3	ft_dotv3(t_vec3 a, t_vec3 b, float (*op)(float, float))
-{
-	t_vec3	result;
-
-	result = ft_create_vec3(op(a.x, b.x), op(a.y, b.y), op(a.z, b.z));
-	
-	return (result);
-}
-
-t_vec3	ft_float_to_vec3(float a)
-{
-	t_vec3	result;
-
-	result.x = a;
-	result.y = a;
-	result.z = a;
-	return (result);
-}
-
-float	ft_dot(t_vec3 a, t_vec3 b)
-{
-	float result;
-
-	result = a.x * b.x + a.y * b.y + a.z * b.z;
-
-	return (result);
-}
-
-t_vec3	ft_normalice(t_vec3 vec)
-{
-	float	magnitud;
-
-	magnitud = ft_dot(vec, vec);
-	magnitud = sqrt(magnitud);
-
-	if (magnitud == 0.0f)
-		return (vec);
-
-	vec.x /= magnitud;
-	vec.y /= magnitud;
-	vec.z /= magnitud;
-
-	return (vec);
-}
-
-float	ft_max(float a, float b)
-{
-	if (a > b)
-		return (a);
-	if (b < a)
-		return (b);
-	return (0.0f);
 }
 
 	// ( bx² ​+ by² ​+ bz² ​)t² + 2(ax​bx ​+ ay​by ​+ az​bz​)t + (ax²​ + ay² + az² − r²) = 0
@@ -177,73 +71,54 @@ int ft_ray_sphere_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphe
 	return 0;
 }
 
-int ft_ray_cylinder_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin)
+int	ft_ray_cylinder_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
 {
-    t_vec3 to_cyl = ft_dotv3(ray_origin, cylinder->position, ft_subtract);
-    float a = ray_dir.x * ray_dir.x + ray_dir.z * ray_dir.z;
-    float b = 2.0f * (ray_dir.x * to_cyl.x + ray_dir.z * to_cyl.z);
-    float c = to_cyl.x * to_cyl.x + to_cyl.z * to_cyl.z - cylinder->radius * cylinder->radius;
-    float disc = b * b - 4.0f * a * c;
-    int intersect_with_body = 0;
-    int intersect_with_bottom = 0;
-    int intersect_with_top = 0;
-
-    // Intersección con el cuerpo del cilindro
-    if (disc >= 0.0f)
-    {
-        float t = (-b - sqrt(disc)) / (2.0f * a);
-        if (t < *closest_t && t > 0.0f)
-        {
-            float y_intersection = to_cyl.y + t * ray_dir.y;
-            float ymin = -cylinder->height / 2.0f;
-            float ymax = cylinder->height / 2.0f;
-            if (y_intersection > ymin && y_intersection < ymax)
-            {
-                *closest_t = t;
-                *origin = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
-                *rgb = cylinder->color;
-                intersect_with_body = 1;
-            }
-        }
-    }
-
-    // Intersección con la tapa inferior
-    if (fabs(ray_dir.y) > 1e-6) // Evitar división por cero
-    {
-        float t_bottom = (cylinder->position.y - cylinder->height / 2.0f - ray_origin.y) / ray_dir.y;
-        if (t_bottom > 0.0f && t_bottom < *closest_t)
-        {
-            t_vec3 hit_point = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t_bottom), ft_multiply), ft_add);
-            if ((hit_point.x - cylinder->position.x) * (hit_point.x - cylinder->position.x) +
-                (hit_point.z - cylinder->position.z) * (hit_point.z - cylinder->position.z) <= cylinder->radius * cylinder->radius)
-            {
-                *closest_t = t_bottom;
-                hit_point.y = cylinder->position.y - cylinder->height / 2.0f;
-                *origin = hit_point;
-                *rgb = cylinder->color;
-                intersect_with_bottom = 1;
-            }
-        }
-
-        // Intersección con la tapa superior
-        float t_top = (cylinder->position.y + cylinder->height / 2.0f - ray_origin.y) / ray_dir.y;
-        if (t_top > 0.0f && t_top < *closest_t)
-        {
-            t_vec3 hit_point = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t_top), ft_multiply), ft_add);
-            if ((hit_point.x - cylinder->position.x) * (hit_point.x - cylinder->position.x) +
-                (hit_point.z - cylinder->position.z) * (hit_point.z - cylinder->position.z) <= cylinder->radius * cylinder->radius)
-            {
-                *closest_t = t_top;
-                hit_point.y = cylinder->position.y + cylinder->height / 2.0f;
-                *origin = hit_point;
-                *rgb = cylinder->color;
-                intersect_with_top = 1;
-            }
-        }
-    }
-	
-    return intersect_with_body || intersect_with_bottom || intersect_with_top;
+	if (cylinder->normal.x == 1 && cylinder->normal.y == 0 && cylinder->normal.z == 0)
+		return (ft_ray_cylinder_intersection_x(ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
+	else if (cylinder->normal.x == 0 && cylinder->normal.y == 1 && cylinder->normal.z == 0)
+		return (ft_ray_cylinder_intersection_y(ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
+	return (ft_ray_cylinder_intersection_z(ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
 }
+
+t_vec3 ft_cross(t_vec3 a, t_vec3 b)
+{
+    t_vec3 result;
+
+    result.x = a.y * b.z - a.z * b.y;
+    result.y = a.z * b.x - a.x * b.z;
+    result.z = a.x * b.y - a.y * b.x;
+
+    return result;
+}
+
+
+int ft_ray_plane_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_plane *plane, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
+{
+    float denom = ft_dot(plane->normal, ray_dir);
+    
+    if (fabs(denom) < 1e-6)
+        return 0;
+
+    t_vec3 p0l0 = ft_dotv3(plane->position, ray_origin, ft_subtract);
+    float t = ft_dot(p0l0, plane->normal) / denom;
+
+    if (t < 0 || t > *closest_t)
+        return 0;
+
+    // Calcular el punto de intersección
+    t_vec3 intersection = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
+
+    *closest_t = t;
+    *origin = intersection;
+    *rgb = plane->color;
+    *normal = plane->normal;
+
+    if (ft_dot(*normal, ray_dir) > 0)
+        *normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
+
+    return 1;
+}
+
 
 
 
@@ -267,6 +142,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
     t_vec3 rgb;
     t_sphere *current_sphere;
     t_cylinder *current_cylinder;
+	t_plane	*current_plane;
     t_vec3 hit_point;
     t_vec3 normal;
 
@@ -277,14 +153,13 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
     found = 0;
     current_sphere = image->sphere;
     current_cylinder = image->cylinder;
+	current_plane = image->plane;
 
     // Buscar intersección con cilindros
     while (current_cylinder)
     {
-        if (ft_ray_cylinder_intersection(ray_origin, ray_dir, current_cylinder, &closestt, &rgb, &origin))
-        {
-            found = 1;
-        }
+        if (ft_ray_cylinder_intersection(ray_origin, ray_dir, current_cylinder, &closestt, &rgb, &origin, &normal))
+            found = 2;
         current_cylinder = current_cylinder->next;
     }
 
@@ -292,11 +167,17 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
     while (current_sphere)
     {
         if (ft_ray_sphere_intersection(ray_origin, ray_dir, current_sphere, &closestt, &rgb, &origin))
-        {
             found = 1;
-        }
         current_sphere = current_sphere->next;
     }
+
+	while (current_plane)
+	{
+		if (ft_ray_plane_intersection(ray_origin, ray_dir, current_plane, &closestt, &rgb, &origin, &normal))
+			found = 3;
+		current_plane = current_plane->next;
+	}
+	
 
     // Si no se encontró ninguna intersección, retornar negro
     if (found == 0)
@@ -304,7 +185,8 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 
     // Calcular el punto de intersección más cercano
     hit_point = ft_dotv3(origin, ft_dotv3(ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
-    normal = ft_normalice(hit_point);  // Normal en el punto de intersección
+	if (found == 1)
+    	normal = ft_normalice(hit_point);  // Normal en el punto de intersección
 
     return ft_calculate_lighting(normal, rgb, image);  // Calcular iluminación
 }

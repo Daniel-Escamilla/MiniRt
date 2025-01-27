@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:37:24 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 16:07:40 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/25 16:53:43 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,14 +108,14 @@ int ft_key_hook(int key, t_image *image)
 	printf("Tecla: %d\n", key);
 	if (key == 65307 || key == 113)
 		ft_end_program(image);
-	if (key == B)
-		image->plane->next->position.z -= 0.1f;
-	if (key == F)
-		image->plane->next->position.z += 0.1f;
-	if (key == U)
-		image->plane->position.y += 0.1f;
-	if (key == N)
-		image->plane->position.y -= 0.1f;
+	// if (key == B)
+	// 	image->plane->next->position.z -= 0.1f;
+	// if (key == F)
+	// 	image->plane->next->position.z += 0.1f;
+	// if (key == U)
+	// 	image->plane->position.y += 0.1f;
+	// if (key == N)
+	// 	image->plane->position.y -= 0.1f;
 	ft_circle(key, image);
 	ft_lights(key, image);
 	ft_moon(key, image);

@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 16:16:26 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/25 17:12:46 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ typedef struct s_sphere
 	t_vec3			position;
 	float			radius;
 	t_vec3			color;
+	int				index;
 	struct s_sphere	*next;
 }					t_sphere;
 
@@ -115,6 +116,7 @@ typedef struct s_cylinder
 	float				height;
 	t_vec3				color;
 	t_vec3				normal;
+	int					index;
 	struct s_cylinder	*next;
 }						t_cylinder;
 
@@ -123,6 +125,7 @@ typedef struct	s_plane
 	t_vec3			position;
 	t_vec3			normal;
 	t_vec3			color;
+	int				index;
 	struct s_plane	*next;
 }				t_plane;
 

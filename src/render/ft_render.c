@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 15:48:16 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:05:50 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,40 @@ uint32_t	ft_convert_rgba(t_vec3 color)
 	// (-b +- sqrt(discriminant)) / 2a
 
 	// radius = 0.5f;
-int ft_ray_sphere_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphere, float *closestt, t_vec3 *rgb, t_vec3 *origin)
+
+	
+// t_vec3 test = ft_dotv3([El punto de golpeo de la esfera(que no se cual es, en vec3)], sphere->position[esto sera solo para las esferas], ft_subtract);
+// float a = ft_dot([Vector de la posicion de la luz, sin normalizar], [Vector de la posicion de la luz, sin normalizar]);
+// float b = 2.0f * ft_dot([Vector de la posicion de la luz, sin normalizar], test);
+// float c = ft_dot(test, test) - sphere->radius[solo servirá para las esferas] * sphere->radius[solo servirá para las esferas];
+// float disc = b * b - 4.0f * a * c;
+
+
+t_vec3	ft_shadow(t_image *image, t_sphere *sphere, t_vec3 light_dir, t_vec3 ray_origin, t_vec3 ray_dir, float closestt, t_vec3 color)
+{
+	(void) image;
+
+	t_vec3 shadow_ray_origin = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_dotv3(ft_float_to_vec3(closestt), ft_float_to_vec3(0.001), ft_add), ft_multiply), ft_add);
+	// t_vec3 shadow_ray_dir = ft_dotv3(light_dir, shadow_ray_origin, ft_subtract);
+
+	light_dir = ft_normalice(light_dir);
+
+	t_vec3 test = ft_dotv3(shadow_ray_origin, sphere->next->position, ft_subtract);
+	float a = ft_dot(light_dir, light_dir);
+	float b = 2.0f * ft_dot(light_dir, test);
+	float c = ft_dot(test, test) - sphere->next->radius * sphere->next->radius;
+	float disc = b * b - 4.0f * a * c;
+
+	if (disc >= 0)
+	{
+		float tt = (-b - sqrt(disc)) / (2.0f * a);
+		printf("%f\n", tt);
+		return ft_dotv3(color, ft_float_to_vec3(0.25f), ft_multiply);
+	}
+	return (color);
+}
+
+int ft_ray_sphere_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphere, float *closestt, t_vec3 *rgb, t_vec3 *origin)
 {
 	t_vec3 test = ft_dotv3(ray_origin, sphere->position, ft_subtract);
 	float a = ft_dot(ray_dir, ray_dir);
@@ -65,6 +98,8 @@ int ft_ray_sphere_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphe
 			*closestt = tt;
 			*origin = test;
 			*rgb = sphere->color;
+			if (sphere->index == 0 || sphere->index == 2)
+				*rgb = ft_shadow(image, sphere, image->color->light_dir, ray_origin, ray_dir, *closestt, sphere->color);
 			return 1;
 		}
 	}
@@ -82,45 +117,42 @@ int	ft_ray_cylinder_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *
 
 t_vec3 ft_cross(t_vec3 a, t_vec3 b)
 {
-    t_vec3 result;
+	t_vec3 result;
 
-    result.x = a.y * b.z - a.z * b.y;
-    result.y = a.z * b.x - a.x * b.z;
-    result.z = a.x * b.y - a.y * b.x;
+	result.x = a.y * b.z - a.z * b.y;
+	result.y = a.z * b.x - a.x * b.z;
+	result.z = a.x * b.y - a.y * b.x;
 
-    return result;
+	return result;
 }
 
 
 int ft_ray_plane_intersection(t_vec3 ray_origin, t_vec3 ray_dir, t_plane *plane, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
 {
-    float denom = ft_dot(plane->normal, ray_dir);
-    
-    if (fabs(denom) < 1e-6)
-        return 0;
+	float denom = ft_dot(plane->normal, ray_dir);
+	
+	if (fabs(denom) < 1e-6)
+		return 0;
 
-    t_vec3 p0l0 = ft_dotv3(plane->position, ray_origin, ft_subtract);
-    float t = ft_dot(p0l0, plane->normal) / denom;
+	t_vec3 p0l0 = ft_dotv3(plane->position, ray_origin, ft_subtract);
+	float t = ft_dot(p0l0, plane->normal) / denom;
 
-    if (t < 0 || t > *closest_t)
-        return 0;
+	if (t < 0 || t > *closest_t)
+		return 0;
 
-    // Calcular el punto de intersección
-    t_vec3 intersection = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
+	// Calcular el punto de intersección
+	t_vec3 intersection = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
 
-    *closest_t = t;
-    *origin = intersection;
-    *rgb = plane->color;
-    *normal = plane->normal;
+	*closest_t = t;
+	*origin = intersection;
+	*rgb = plane->color;
+	*normal = plane->normal;
 
-    if (ft_dot(*normal, ray_dir) > 0)
-        *normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
+	if (ft_dot(*normal, ray_dir) > 0)
+		*normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
 
-    return 1;
+	return 1;
 }
-
-
-
 
 t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
 {
@@ -134,61 +166,56 @@ t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
 
 t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 {
-    t_vec3 ray_dir;
-    t_vec3 ray_origin;
-    t_vec3 origin;
-    float closestt;
-    int found;
-    t_vec3 rgb;
-    t_sphere *current_sphere;
-    t_cylinder *current_cylinder;
+	t_vec3 ray_dir;
+	t_vec3 ray_origin;
+	t_vec3 origin;
+	float closestt;
+	int found;
+	t_vec3 rgb;
+	t_sphere *current_sphere;
+	t_cylinder *current_cylinder;
 	t_plane	*current_plane;
-    t_vec3 hit_point;
-    t_vec3 normal;
+	t_image	*current_image;
+	t_vec3 hit_point;
+	t_vec3 normal;
 
-    coord.x *= image->aspect_ratio;
-    ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
-    ray_origin = ft_create_vec3(0.0f, 0.0f, 3.0f);
-    closestt = FLT_MAX;  // Inicializa la distancia más cercana
-    found = 0;
-    current_sphere = image->sphere;
-    current_cylinder = image->cylinder;
+	coord.x *= image->aspect_ratio;
+	ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
+	ray_origin = ft_create_vec3(0.0f, 0.0f, 5.0f); // Camara
+	closestt = FLT_MAX;  // Inicializa la distancia más cercana
+	found = 0;
+	current_sphere = image->sphere;
+	current_cylinder = image->cylinder;
 	current_plane = image->plane;
-
-    // Buscar intersección con cilindros
-    while (current_cylinder)
-    {
-        if (ft_ray_cylinder_intersection(ray_origin, ray_dir, current_cylinder, &closestt, &rgb, &origin, &normal))
-            found = 2;
-        current_cylinder = current_cylinder->next;
-    }
-
-    // Buscar intersección con esferas
-    while (current_sphere)
-    {
-        if (ft_ray_sphere_intersection(ray_origin, ray_dir, current_sphere, &closestt, &rgb, &origin))
-            found = 1;
-        current_sphere = current_sphere->next;
-    }
-
+	current_image = image;
+	while (current_sphere)
+	{
+		if (ft_ray_sphere_intersection(current_image, ray_origin, ray_dir, current_sphere, &closestt, &rgb, &origin))
+			found = 1;
+		current_sphere = current_sphere->next;
+	}
+	while (current_cylinder)
+	{
+		if (ft_ray_cylinder_intersection(ray_origin, ray_dir, current_cylinder, &closestt, &rgb, &origin, &normal))
+			found = 2;
+		current_cylinder = current_cylinder->next;
+	}
 	while (current_plane)
 	{
 		if (ft_ray_plane_intersection(ray_origin, ray_dir, current_plane, &closestt, &rgb, &origin, &normal))
 			found = 3;
 		current_plane = current_plane->next;
 	}
-	
+	// Si no se encontró ninguna intersección, retornar negro
+	if (found == 0)
+		return ft_float_to_vec3(0.0f);
 
-    // Si no se encontró ninguna intersección, retornar negro
-    if (found == 0)
-        return ft_float_to_vec3(0.0f);
-
-    // Calcular el punto de intersección más cercano
-    hit_point = ft_dotv3(origin, ft_dotv3(ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
+	// Calcular el punto de intersección más cercano
+	hit_point = ft_dotv3(origin, ft_dotv3(ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
 	if (found == 1)
-    	normal = ft_normalice(hit_point);  // Normal en el punto de intersección
+		normal = ft_normalice(hit_point);  // Normal en el punto de intersección
 
-    return ft_calculate_lighting(normal, rgb, image);  // Calcular iluminación
+	return ft_calculate_lighting(normal, rgb, image);  // Calcular iluminación
 }
 
 

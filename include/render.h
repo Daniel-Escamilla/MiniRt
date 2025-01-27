@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:21:49 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 11:59:30 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/27 10:22:57 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "../minirt.h"
 
 // ft_render.c
+int		ft_ray_sphere_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphere, float *closestt, t_vec3 *rgb, t_vec3 *origin);
 void	ft_create_render(t_mlx *data, t_image *image);
 t_vec3	ft_create_vec3(float a, float b, float c);
 t_vec3	ft_float_to_vec3(float a);

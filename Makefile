@@ -3,7 +3,7 @@ NAME = minirt
 
 # Compilador y flags
 CC = gcc
-CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender
+CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender        -pthread
 
 # Directorio de fuentes
 SRC_DIR = src

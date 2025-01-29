@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/25 17:12:46 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/29 10:48:58 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,15 @@ typedef struct
 // 	float	a;
 // } 		t_vec4;
 
-
+typedef struct s_cuadratic
+{
+	float	a;
+	float	b;
+	float	c;
+	float	tt;
+	float	disc;
+	t_vec3	test;
+}			t_cuadratic;
 
 typedef struct s_keys
 {

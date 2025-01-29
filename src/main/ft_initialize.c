@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:18:01 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/27 14:58:22 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:20:58 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ void	ft_initialize(t_image *image)
 	image->plane = ft_calloc(sizeof(t_plane), 1);
 	image->ambient = ft_calloc(sizeof(t_ambient), 1);
 	
-	image->width = 1200;
-	image->height = 1200;
+	image->width = 600;
+	image->height = 600;
 	
 	image->color->plus = 1;
 
@@ -60,28 +60,28 @@ void	ft_initialize(t_image *image)
 	image->sphere->next->next->next->color = ft_create_vec3(1.0f, 0.0f, 0.0f);
 	image->sphere->next->next->next->index = 3;
 
-	// image->cylinder->position = ft_create_vec3(-2.0f, 0.0f, 0.0f);
-	// image->cylinder->radius = 0.5f;
-	// image->cylinder->height = 2.0f;
-	// image->cylinder->normal = ft_create_vec3(0.0f, 1.0f, 0.0f);
-	// image->cylinder->color = ft_create_vec3(1.0f, 1.0f, 0.0f);
+	image->cylinder->position = ft_create_vec3(-3.0f, -1.0f, 0.0f);
+	image->cylinder->radius = 1.0f;
+	image->cylinder->height = 2.0f;
+	image->cylinder->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
+	image->cylinder->color = ft_create_vec3(1.0f, 1.0f, 1.0f);
 
-	// image->plane->position = ft_create_vec3(1.0f, -2.5f, 2.0f);
-	// image->plane->normal = ft_create_vec3(0.0f, 1.0f, 0.0f);
-	// image->plane->color = ft_create_vec3(0.0f, 1.0f, 1.0f);
+	image->plane->position = ft_create_vec3(1.0f, -2.5f, 2.0f);
+	image->plane->normal = ft_create_vec3(0.0f, 1.0f, 0.0f);
+	image->plane->color = ft_create_vec3(0.0f, 0.75f, 1.0f);
 
-	// image->plane->next = ft_calloc(sizeof(t_plane), 1);
-	// image->plane->next->position = ft_create_vec3(1.0f, 0.0f, -5.0f);
-	// image->plane->next->normal = ft_create_vec3(0.0f, 0.0f, 1.0f);
-	// image->plane->next->color = ft_create_vec3(1.0f, 0.0, 1.0f);
+	image->plane->next = ft_calloc(sizeof(t_plane), 1);
+	image->plane->next->position = ft_create_vec3(1.0f, 0.0f, -5.0f);
+	image->plane->next->normal = ft_create_vec3(0.0f, 0.0f, 1.0f);
+	image->plane->next->color = ft_create_vec3(1.0f, 0.0, 1.0f);
 	
-	// image->plane->next->next = ft_calloc(sizeof(t_plane), 1);
-	// image->plane->next->next->position = ft_create_vec3(5.0f, 0.0f, 2.0f);
-	// image->plane->next->next->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
-	// image->plane->next->next->color = ft_create_vec3(1.0f, 1.0, 0.0f);
+	image->plane->next->next = ft_calloc(sizeof(t_plane), 1);
+	image->plane->next->next->position = ft_create_vec3(5.0f, 0.0f, 2.0f);
+	image->plane->next->next->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
+	image->plane->next->next->color = ft_create_vec3(1.0f, 1.0, 0.0f);
 
-	image->color->light_dir.x = -3.0f;
-	image->color->light_dir.y = 0.0f;
+	image->color->light_dir.x = 0.0f;
+	image->color->light_dir.y = -8.0f;
 	image->color->light_dir.z = 0.0f;
 
 	image->aspect_ratio = (float)image->width / (float)image->height;

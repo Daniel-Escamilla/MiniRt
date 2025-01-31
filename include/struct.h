@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/29 10:48:58 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/31 19:31:10 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,50 @@ typedef struct
 	float	y;
 } 		t_vec2;
 
-typedef struct
+typedef union u_vec3
 {
-	float	x;
-	float	y;
-	float	z;
-} 		t_vec3;
+	struct
+	{
+		float		r;
+		float		g;
+		float		b;
+	};
+	struct
+	{
+		float		x;
+		float		y;
+		float		z;
+	};
+	struct
+	{
+		float		v1;
+		float		v2;
+		float		v3;
+	};
+}					t_vec3;
+
+typedef struct s_tt
+{
+	float	tap1;
+	float	tap2;
+}			t_tt;
+
+typedef struct s_cy_formula
+{
+	t_vec3	ray_origin;
+	t_vec3	ray_dir;
+	t_vec3	cy_pos;
+	t_vec3	hit_point;
+	t_vec3	to_cyl;
+	int		inter;
+	float	intersection;
+	int		shadow;
+	t_vec3	axis;
+	t_vec3	to_hit;
+	t_tt	tt;
+	t_vec3	projection;
+	
+}			t_cy_formula;
 
 // typedef struct
 // {

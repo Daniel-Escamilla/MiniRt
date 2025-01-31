@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 11:31:55 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 11:32:07 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/31 14:59:10 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,5 @@ t_vec3	ft_dotv3(t_vec3 a, t_vec3 b, float (*op)(float, float))
 	t_vec3	result;
 
 	result = ft_create_vec3(op(a.x, b.x), op(a.y, b.y), op(a.z, b.z));
-	
 	return (result);
 }

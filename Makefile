@@ -3,7 +3,7 @@ NAME = minirt
 
 # Compilador y flags
 CC = gcc
-CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender        -pthread
+CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender  # -Wpedantic -Wshadow -Wformat -Wnull-dereference -Wconversion -Wstrict-overflow -Wsign-conversion -Wimplicit-fallthrough=5 -Wdouble-promotion -Wvla -Wformat-security -Wcast-align=strict -Wredundant-decls -Wlogical-op -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Winit-self -Wuninitialized -Wbad-function-cast -Wmissing-field-initializers
 
 # Directorio de fuentes
 SRC_DIR = src
@@ -17,7 +17,8 @@ HOOKS_SRC =		src/hooks/ft_hooks.c \
 RENDER_SRC =    src/render/ft_maths.c \
 				src/render/ft_dotv3.c \
 				src/render/ft_render.c \
-				src/render/ft_cylinder.c \
+				src/render/ft_cy_formula.c \
+				# src/render/ft_cylinder.c \
 
 # Archivos fuente
 SRCS = 	$(MAIN_SRC) \

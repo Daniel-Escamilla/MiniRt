@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:40:46 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/31 22:17:54 by descamil         ###   ########.fr       */
+/*   Updated: 2025/01/31 22:25:31 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,16 +114,11 @@ int	ft_cylinder_formula(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cyl
 	t_cuadratic		cuadratic;
 	t_vec3			hit_point;
 
-// BIEN //
-
 	v = ft_init_cy(ray_origin, ray_dir, cy, type);
 	cuadratic.a = v.ray_dir.v1 * v.ray_dir.v1 + v.ray_dir.v2 * v.ray_dir.v2;
 	cuadratic.b = 2.0f * (v.ray_dir.v1 * v.to_cyl.v1 + v.ray_dir.v2 * v.to_cyl.v2);
 	cuadratic.c = v.to_cyl.v1 * v.to_cyl.v1 + v.to_cyl.v2 * v.to_cyl.v2 - cy->radius * cy->radius;
 	cuadratic.disc = cuadratic.b * cuadratic.b - 4.0f * cuadratic.a * cuadratic.c;
-
-// BIEN //
-
 	if (cuadratic.disc >= 0.0f)
 	{
 		cuadratic.tt = (-cuadratic.b - sqrt(cuadratic.disc)) / (2.0f * cuadratic.a);
@@ -172,9 +167,6 @@ int	ft_cylinder_formula(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cyl
 				*origin = hit_point;
 				v.shadow = ft_shadow_sphere(image, image->color->light_dir, *origin, cy->color, rgb);
 				v.inter = 1;
-				printf("X = %f\n", v.axis.x);
-				printf("Y = %f\n", v.axis.y);
-				printf("Z = %f\n", v.axis.z);
 				*normal = v.axis;
 			}
 		}

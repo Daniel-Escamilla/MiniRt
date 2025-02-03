@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/31 19:31:10 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/01 19:29:20 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ typedef struct s_cy_formula
 	t_vec3	cy_pos;
 	t_vec3	hit_point;
 	t_vec3	to_cyl;
-	int		inter;
+	int		*inter;
 	float	intersection;
 	int		shadow;
 	t_vec3	axis;
@@ -106,6 +106,7 @@ typedef struct s_cy_formula
 	t_vec3	projection;
 	
 }			t_cy_formula;
+
 
 // typedef struct
 // {
@@ -184,6 +185,8 @@ typedef struct	s_light
 
 typedef struct s_camera
 {
+	t_vec3		position;
+	t_vec3		normal;
 	float		fov;
 } t_camera;
 
@@ -217,5 +220,18 @@ typedef struct s_image
     int			mouse_y;
 	
 }				t_image;
+
+typedef struct s_ray_values
+{
+	t_image		*current_image;
+	t_sphere	*current_sp;
+	t_cylinder	*current_cy;
+	t_plane		*current_pl;
+	t_vec3		ray_origin;
+	t_vec3		ray_dir;
+	t_vec3		*origin;
+	float		*tt;
+	int			found;
+}				t_ray_values;
 
 #endif

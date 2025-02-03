@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/31 22:04:38 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/01 20:55:30 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,27 +131,67 @@ int ft_shadow_sphere(t_image *image, t_vec3 light_dir, t_vec3 intersection_point
 // }
 
 
-int ft_ray_sphere_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphere, float *closestt, t_vec3 *rgb, t_vec3 *origin)
+#define LIGHT_RADIUS 0.5f
+#define LIGHT_COLOR (t_vec3){{1.0f, 1.0f, 1.0f}}
+
+int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
-	int			shadow;
 	t_cuadratic	values;
 
-	values.test = ft_dotv3(ray_origin, sphere->position, ft_subtract);
-	values.a = ft_dot(ray_dir, ray_dir);
-	values.b = 2.0f * ft_dot(ray_dir, values.test);
-	values.c = ft_dot(values.test, values.test) - sphere->radius * sphere->radius;
+	// image->color->light_dir.x *= -1;
+	// image->color->light_dir.y *= -1;
+	// image->color->light_dir.x *= -1;
+	t_vec3 pos = image->color->light_dir;
+
+	pos.x *= -1;
+	pos.y *= 1;
+	pos.z *= -1;
+
+	values.test = ft_dotv3((*v).ray_origin, pos, ft_subtract);
+	values.a = ft_dot((*v).ray_dir, (*v).ray_dir);
+	values.b = 2.0f * ft_dot((*v).ray_dir, values.test);
+	values.c = ft_dot(values.test, values.test) - LIGHT_RADIUS * LIGHT_RADIUS;
 	values.disc = values.b * values.b - 4.0f * values.a * values.c;
 
 	if (values.disc >= 0)
 	{
 		values.tt = (-values.b - sqrt(values.disc)) / (2.0f * values.a);
-		if (values.tt < *closestt)
+		if (values.tt < *(*v).tt)
 		{
-			*closestt = values.tt;
-			*origin = values.test;
-			*rgb = sphere->color;
-			t_vec3 intersection_point = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(*closestt), ft_multiply), ft_add);
-			shadow = ft_shadow_sphere(image, image->color->light_dir, intersection_point, sphere->color, rgb);
+			*(*v).tt = values.tt;
+			*(*v).origin = values.test;
+			*rgb = (*v).current_sp->color;
+			t_vec3 intersection_point = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(*(*v).tt), ft_multiply), ft_add);
+			*normal = ft_normalice(intersection_point);
+			return (1);
+		}
+	}
+	return (0);
+}
+
+
+
+int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
+{
+	t_cuadratic	values;
+	int			shadow;
+
+	values.test = ft_dotv3((*v).ray_origin, (*v).current_sp->position, ft_subtract);
+	values.a = ft_dot((*v).ray_dir, (*v).ray_dir);
+	values.b = 2.0f * ft_dot((*v).ray_dir, values.test);
+	values.c = ft_dot(values.test, values.test) - (*v).current_sp->radius * (*v).current_sp->radius;
+	values.disc = values.b * values.b - 4.0f * values.a * values.c;
+
+	if (values.disc >= 0)
+	{
+		values.tt = (-values.b - sqrt(values.disc)) / (2.0f * values.a);
+		if (values.tt < *(*v).tt)
+		{
+			*(*v).tt = values.tt;
+			*(*v).origin = values.test;
+			*rgb = (*v).current_sp->color;
+			t_vec3 intersection_point = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(*(*v).tt), ft_multiply), ft_add);
+			shadow = ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection_point, (*v).current_sp->color, rgb);
 			if (shadow == 1)
 				return (1);
 			return (1);
@@ -160,18 +200,18 @@ int ft_ray_sphere_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir
 	return (0);
 }
 
-int	ft_ray_cylinder_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
+// void	ft_init_cy_values()
+// {
+	
+// }
+
+int	ft_ray_cylinder_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
-	if (cylinder->normal.x == 1 && cylinder->normal.y == 0 && cylinder->normal.z == 0)
-		return (ft_cylinder_formula(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal,'X'));
-	else if (cylinder->normal.x == 0 && cylinder->normal.y == 1 && cylinder->normal.z == 0)
-		return (ft_cylinder_formula(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal, 'Y'));
-	return (ft_cylinder_formula(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal, 'Z'));
-	// if (cylinder->normal.x == 1 && cylinder->normal.y == 0 && cylinder->normal.z == 0)
-	// 	return (ft_ray_cylinder_intersection_x(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
-	// else if (cylinder->normal.x == 0 && cylinder->normal.y == 1 && cylinder->normal.z == 0)
-	// 	return (ft_ray_cylinder_intersection_y(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
-	// return (ft_ray_cylinder_intersection_x(image, ray_origin, ray_dir, cylinder, closest_t, rgb, origin, normal));
+	if ((*v).current_cy->normal.x == 1 && (*v).current_cy->normal.y == 0 && (*v).current_cy->normal.z == 0)
+		return (ft_cylinder_formula(v, rgb, normal,'X'));
+	else if ((*v).current_cy->normal.x == 0 && (*v).current_cy->normal.y == 1 && (*v).current_cy->normal.z == 0)
+		return (ft_cylinder_formula(v, rgb, normal, 'Y'));
+	return (ft_cylinder_formula(v, rgb, normal, 'Z'));
 }
 
 t_vec3 ft_cross(t_vec3 a, t_vec3 b)
@@ -195,7 +235,7 @@ float max_or_min(float value, float min, float max)
 }
 
 
-int ft_ray_plane_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_plane *plane, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
+int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
     float denom;
     float t;
@@ -208,27 +248,27 @@ int ft_ray_plane_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir,
     const float k_l = 0.1f;  // Atenuación lineal
     const float k_q = 0.01f; // Atenuación cuadrática
 
-    denom = ft_dot(plane->normal, ray_dir);
+    denom = ft_dot((*v).current_pl->normal, (*v).ray_dir);
     
     if (fabs(denom) < 0.000001)
         return 0;
 
-    p0l0 = ft_dotv3(plane->position, ray_origin, ft_subtract);
-    t = ft_dot(p0l0, plane->normal) / denom;
+    p0l0 = ft_dotv3((*v).current_pl->position, (*v).ray_origin, ft_subtract);
+    t = ft_dot(p0l0, (*v).current_pl->normal) / denom;
 
-    if (t < 0 || t > *closest_t)
+    if (t < 0 || t > *(*v).tt)
         return 0;
 
-    intersection = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
+    intersection = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
 
-    *closest_t = t;
-    *origin = intersection;
+    *(*v).tt = t;
+    *(*v).origin = intersection;
 
-    shadow = ft_shadow_sphere(image, image->color->light_dir, intersection, plane->color, rgb);
+    shadow = ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection, (*v).current_pl->color, rgb);
     (void)shadow;
 
     // Calcular distancia a la fuente de luz
-    distance_to_light = ft_length(ft_dotv3(image->color->light_dir, intersection, ft_subtract));
+    distance_to_light = ft_length(ft_dotv3((*v).current_image->color->light_dir, intersection, ft_subtract));
 
     // Calcular atenuación en función de la distancia
     attenuation = 1.0f / (k_c + k_l * distance_to_light + k_q * distance_to_light * distance_to_light);
@@ -239,47 +279,27 @@ int ft_ray_plane_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir,
     t_vec3 attenuated_color = ft_dotv3(*rgb, ft_float_to_vec3(brightness), ft_multiply);
     *rgb = attenuated_color;
 
-    *normal = plane->normal;
+    *normal = (*v).current_pl->normal;
     
-    if (ft_dot(*normal, ray_dir) > 0)
+    if (ft_dot(*normal, (*v).ray_dir) > 0)
         *normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
 
     return 1;
 }
 
 
-
-// int ft_ray_plane_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_plane *plane, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal)
+// float ft_ray_plane_intersection(t_ray_values *v, t_plane *pl, t_vec3 nor)
 // {
-//     float denom;
-//     float t;
-//     t_vec3 p0l0;
-//     t_vec3 intersection;
-//     int shadow;
-
-//     denom = ft_dot(plane->normal, ray_dir);
+//     t_vec3 ray_dir = ft_normalice(v->ray_dir);
+//     float denom = ft_dot(ray_dir, pl->normal);
     
-//     if (fabs(denom) < 0.000001)
-//         return 0;
+//     if (fabs(denom) < 1e-6)
+//         return FLT_MAX;
 
-//     p0l0 = ft_dotv3(plane->position, ray_origin, ft_subtract);
-//     t = ft_dot(p0l0, plane->normal) / denom;
-
-//     if (t < 0 || t > *closest_t)
-//         return 0;
-
-//     intersection = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
-
-//     *closest_t = t;
-//     *origin = intersection;
-//     shadow = ft_shadow_sphere(image, 0, image->color->light_dir, intersection, plane->color, rgb);
-//     (void)shadow;
-
-//     *normal = plane->normal;
-//     if (ft_dot(*normal, ray_dir) > 0)
-//         *normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
-
-//     return 1;
+//     t_vec3 p0l0 = ft_dotv3(pl->position, v->ray_origin, ft_subtract);
+//     float t = ft_dot(p0l0, pl->normal) / denom;
+    
+//     return (t >= 0) ? t : FLT_MAX;
 // }
 
 
@@ -289,62 +309,77 @@ t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image, int foun
 	t_vec3 light_dir = ft_normalice(image->color->light_dir);
 	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
 	float d = ft_max(ft_dot(normal, light_dir), 0.0f);
-	if (d < 0.05f && found != 1)
-		d = 0.05f;
+	if (d < 0.1f && found != 1)
+		d = 0.1f;
 	directional_color = ft_dotv3(ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply), ft_float_to_vec3(0.1), ft_add);
 	return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
 }
 
+t_ray_values	ft_init_ray_values(t_image *image, t_vec2 coord)
+{
+	t_ray_values	values;
+
+	// coord.x *= image->aspect_ratio;
+	// values.ray_dir = ft_create_vec3(-1.0f, coord.y, coord.x);
+	// values.ray_origin = ft_create_vec3(15.0f, 0.0f, 0.0f);
+	values.ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
+	values.ray_origin = ft_create_vec3(0.0f, 0.0f, 10.f);
+	values.tt = ft_calloc(sizeof(float), 1);
+	*values.tt = FLT_MAX;// Inicializa la distancia más cercana
+	values.found = 0;
+	values.current_sp = image->sphere;
+	values.current_cy = image->cylinder;
+	values.current_pl = image->plane;
+	values.current_image = image;
+	values.origin = ft_calloc(sizeof(t_vec3), 1);
+	*values.origin = ft_create_vec3(0, 0, 0);
+
+	return (values);
+}
+
 t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 {
-	t_vec3 ray_dir;
-	t_vec3 ray_origin;
-	t_vec3 origin;
-	float closestt;
-	int found;
-	t_vec3 rgb;
-	t_sphere *current_sphere;
-	t_cylinder *current_cylinder;
-	t_plane	*current_plane;
-	t_image	*current_image;
-	t_vec3 hit_point;
-	t_vec3 normal;
+	t_ray_values	v;
+	t_vec3			hit_point;
+	t_vec3			normal;
+	t_vec3			rgb;
+	float			tt;
 
-	coord.x *= image->aspect_ratio;
-	ray_dir = ft_create_vec3(coord.x, coord.y, -1.0f);
-	ray_origin = ft_create_vec3(0.0f, 0.0f, 6.0f); // Camara
-	closestt = FLT_MAX;  // Inicializa la distancia más cercana
-	found = 0;
-	current_sphere = image->sphere;
-	current_cylinder = image->cylinder;
-	current_plane = image->plane;
-	current_image = image;
-	while (current_sphere)
+	v = ft_init_ray_values(image, coord);
+	if (ft_ray_light_intersection(image, &v, &rgb, &normal))
 	{
-		if (ft_ray_sphere_intersection(current_image, ray_origin, ray_dir, current_sphere, &closestt, &rgb, &origin))
-			found = 1;
-		current_sphere = current_sphere->next;
+		tt = *v.tt;
 	}
-	while (current_cylinder)
+	while (v.current_sp)
 	{
-		if (ft_ray_cylinder_intersection(image, ray_origin, ray_dir, current_cylinder, &closestt, &rgb, &origin, &normal))
-			found = 2;
-		current_cylinder = current_cylinder->next;
+		if (ft_ray_sphere_intersection(&v, &rgb))
+			v.found = 1;
+		v.current_sp = v.current_sp->next;
 	}
-	while (current_plane)
+	while (v.current_cy)
 	{
-		if (ft_ray_plane_intersection(image, ray_origin, ray_dir, current_plane, &closestt, &rgb, &origin, &normal))
-			found = 3;
-		current_plane = current_plane->next;
+		if (ft_ray_cylinder_intersection(&v, &rgb, &normal))
+		{
+			v.found = 2;
+		}
+		v.current_cy = v.current_cy->next;
 	}
-	hit_point = ft_dotv3(origin, ft_dotv3(ray_dir, ft_float_to_vec3(closestt), ft_multiply), ft_add);
-	if (found == 1)
-		normal = ft_normalice(hit_point);  // Normal en el punto de intersección
-	// Si no se encontró ninguna intersección, retornar negro
-	if (found == 0)
+	while (v.current_pl)
+	{
+		if (ft_ray_plane_intersection(&v, &rgb, &normal))
+			v.found = 3;
+		v.current_pl = v.current_pl->next;
+	}
+	hit_point = ft_dotv3(*v.origin, ft_dotv3(v.ray_dir, ft_float_to_vec3(*v.tt), ft_multiply), ft_add);
+	if (v.found == 1)
+		normal = ft_normalice(hit_point);
+	if (*v.tt == tt)
+		return ((t_vec3){{1.0f, 1.0f, 1.0f}});
+	if (v.found == 0)
 		return ft_float_to_vec3(0.0f);
-
-	return ft_calculate_lighting(normal, rgb, image, found);  // Calcular iluminación
+	free(v.tt);
+	free(v.origin);
+	return ft_calculate_lighting(normal, rgb, image, v.found);  // Calcular iluminación
 }
 
 # include <time.h>

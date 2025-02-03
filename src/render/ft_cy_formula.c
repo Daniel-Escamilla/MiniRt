@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:40:46 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/31 22:25:31 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/01 19:26:51 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,8 @@ t_cy_formula	ft_init_cy(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder,
 	ft_init_global(&values, cylinder->position, type, "POS");
 	ft_init_global(&values, ray_dir, type, "DIR");
 	ft_init_axis(&values, type);
-	values.inter = 0;
+	values.inter = ft_calloc(sizeof(int), 1);
+	*values.inter = 0;
 	return (values);
 }
 
@@ -108,68 +109,67 @@ t_cy_formula	ft_init_cy(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder,
 // 		// (*ray).v3 = tmp;
 // }
 
-int	ft_cylinder_formula(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cy, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal, int type)
+void	ft_cy_body(t_ray_values *r, t_cuadratic cuadratic, t_cy_formula *v, t_vec3 *rgb, t_vec3 *normal)
+{
+	t_vec3			hit_point;
+
+	cuadratic.tt = (-cuadratic.b - sqrt(cuadratic.disc)) / (2.0f * cuadratic.a);
+	if (cuadratic.tt < *r->tt && cuadratic.tt > 0.0f)
+	{
+		v->intersection = v->to_cyl.v3 + cuadratic.tt * v->ray_dir.v3;
+		float min = -r->current_cy->height / 2.0f;
+		float max = r->current_cy->height / 2.0f;
+		if (v->intersection > min && v->intersection < max)
+		{
+			*r->tt = cuadratic.tt;
+			*r->origin = ft_dotv3(r->ray_origin, ft_dotv3(r->ray_dir, ft_float_to_vec3(cuadratic.tt), ft_multiply), ft_add);
+			*v->inter = 1;
+			hit_point = *r->origin;
+			v->to_hit = ft_dotv3(hit_point, r->current_cy->position, ft_subtract);
+			v->shadow = ft_shadow_sphere(r->current_image, r->current_image->color->light_dir, hit_point, r->current_cy->color, rgb);
+			v->projection = ft_dotv3(v->to_hit, ft_dotv3(v->axis, ft_float_to_vec3(ft_dot(v->to_hit, v->axis)), ft_multiply), ft_subtract);
+			*normal = ft_normalice(v->projection);
+		}
+	}
+}
+
+int	ft_cylinder_formula(t_ray_values *r, t_vec3 *rgb, t_vec3 *normal, int type)
 {
 	t_cy_formula	v;
 	t_cuadratic		cuadratic;
 	t_vec3			hit_point;
 
-	v = ft_init_cy(ray_origin, ray_dir, cy, type);
+	v = ft_init_cy(r->ray_origin, r->ray_dir, r->current_cy, type);
 	cuadratic.a = v.ray_dir.v1 * v.ray_dir.v1 + v.ray_dir.v2 * v.ray_dir.v2;
 	cuadratic.b = 2.0f * (v.ray_dir.v1 * v.to_cyl.v1 + v.ray_dir.v2 * v.to_cyl.v2);
-	cuadratic.c = v.to_cyl.v1 * v.to_cyl.v1 + v.to_cyl.v2 * v.to_cyl.v2 - cy->radius * cy->radius;
+	cuadratic.c = v.to_cyl.v1 * v.to_cyl.v1 + v.to_cyl.v2 * v.to_cyl.v2 - r->current_cy->radius * r->current_cy->radius;
 	cuadratic.disc = cuadratic.b * cuadratic.b - 4.0f * cuadratic.a * cuadratic.c;
 	if (cuadratic.disc >= 0.0f)
-	{
-		cuadratic.tt = (-cuadratic.b - sqrt(cuadratic.disc)) / (2.0f * cuadratic.a);
-		if (cuadratic.tt < *closest_t && cuadratic.tt > 0.0f)
-		{
-			v.intersection = v.to_cyl.v3 + cuadratic.tt * v.ray_dir.v3;
-			float min = -cy->height / 2.0f;
-			float max = cy->height / 2.0f;
-			if (v.intersection > min && v.intersection < max)
-			{
-				*closest_t = cuadratic.tt;
-				*origin = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(cuadratic.tt), ft_multiply), ft_add);
-				
-				v.inter = 1;
-				
-				hit_point = *origin;
-				// v.axis = ft_create_vec3(1, 0, 0);
-				v.to_hit = ft_dotv3(hit_point, cy->position, ft_subtract);
-				v.shadow = ft_shadow_sphere(image, image->color->light_dir, hit_point, cy->color, rgb);
-				v.projection = ft_dotv3(v.to_hit, ft_dotv3(v.axis, ft_float_to_vec3(ft_dot(v.to_hit, v.axis)), ft_multiply), ft_subtract);
-				*normal = ft_normalice(v.projection);
-				float d = ft_max(ft_dot(*normal, image->color->light_dir), 0.0f);
-				if (d < 0.00f)
-					printf("aja\n");
-			}
-		}
-	}
+		ft_cy_body(r, cuadratic, &v, rgb, normal);
 	if (fabs(v.ray_dir.v3) > 1e-6)
 	{
 		float	tap;
-		v.tt.tap1 = (v.cy_pos.v3 - cy->height / 2.0f - v.ray_origin.v1) / v.ray_dir.v3;
-		v.tt.tap2 = (v.cy_pos.v3 + cy->height / 2.0f - v.ray_origin.v1) / v.ray_dir.v3;
+		v.tt.tap1 = (v.cy_pos.v3 - r->current_cy->height / 2.0f - v.ray_origin.v1) / v.ray_dir.v3;
+		v.tt.tap2 = (v.cy_pos.v3 + r->current_cy->height / 2.0f - v.ray_origin.v1) / v.ray_dir.v3;
 		tap = v.tt.tap1;
 		if (tap > v.tt.tap2)
 			tap = v.tt.tap2;
-		if (tap > 0.0f && tap < *closest_t)
+		if (tap > 0.0f && tap < *r->tt)
 		{
-			hit_point = ft_dotv3(ray_origin, ft_dotv3(ray_dir, ft_float_to_vec3(tap), ft_multiply), ft_add);
+			hit_point = ft_dotv3(r->ray_origin, ft_dotv3(r->ray_dir, ft_float_to_vec3(tap), ft_multiply), ft_add);
 			ft_init_global(&v, hit_point, type, "HIT");
 			if ((v.hit_point.v1 - v.cy_pos.v1) * (v.hit_point.v1 - v.cy_pos.v1) +
-				(v.hit_point.v2 - v.cy_pos.v2) * (v.hit_point.v2 - v.cy_pos.v2) <= cy->radius * cy->radius)
+				(v.hit_point.v2 - v.cy_pos.v2) * (v.hit_point.v2 - v.cy_pos.v2) <= r->current_cy->radius * r->current_cy->radius)
 			{
-				*closest_t = tap;
+				*r->origin = hit_point;
+				v.shadow = ft_shadow_sphere(r->current_image, r->current_image->color->light_dir, *r->origin, r->current_cy->color, rgb);
+				*r->tt = tap;
 				if (tap == v.tt.tap1)
 					ft_neg_axis(&v, type);
-				*origin = hit_point;
-				v.shadow = ft_shadow_sphere(image, image->color->light_dir, *origin, cy->color, rgb);
-				v.inter = 1;
+				*v.inter = 1;
 				*normal = v.axis;
 			}
 		}
 	}
-	return (v.inter);
+	return (*v.inter);
 }

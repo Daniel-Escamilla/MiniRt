@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:21:49 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/31 21:24:32 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/01 12:46:52 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include "../minirt.h"
 
 // ft_render.c
-int		ft_ray_sphere_intersection(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_sphere *sphere, float *closestt, t_vec3 *rgb, t_vec3 *origin);
+int		ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb);
 int		ft_shadow_sphere(t_image *image, t_vec3 light_dir, t_vec3 intersection_point, t_vec3 color, t_vec3 *rgb);
 void	ft_create_render(t_mlx *data, t_image *image);
 // t_vec3	ft_create_vec3(float a, float b, float c);
@@ -41,6 +41,6 @@ t_vec3  ft_create_vec3(float a, float b, float c);
 // int ft_ray_cylinder_intersection_x(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal);
 // int ft_ray_cylinder_intersection_y(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal);
 // int ft_ray_cylinder_intersection_z(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal);
-int		ft_cylinder_formula(t_image *image, t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cy, float *closest_t, t_vec3 *rgb, t_vec3 *origin, t_vec3 *normal, int type);
+int		ft_cylinder_formula(t_ray_values *r, t_vec3 *rgb, t_vec3 *normal, int type);
 
 #endif

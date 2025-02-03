@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/03 19:28:06 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/03 19:33:29 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,11 +191,6 @@ int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 	return (0);
 }
 
-// void	ft_init_cy_values()
-// {
-	
-// }
-
 int	ft_ray_cylinder_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
 	if ((*v).current_cy->normal.x == 1 && (*v).current_cy->normal.y == 0 && (*v).current_cy->normal.z == 0)
@@ -224,7 +219,6 @@ float max_or_min(float value, float min, float max)
 		return (max);
     return (value);
 }
-
 
 int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
@@ -278,22 +272,6 @@ int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
     return 1;
 }
 
-
-// float ft_ray_plane_intersection(t_ray_values *v, t_plane *pl, t_vec3 nor)
-// {
-//     t_vec3 ray_dir = ft_normalice(v->ray_dir);
-//     float denom = ft_dot(ray_dir, pl->normal);
-    
-//     if (fabs(denom) < 1e-6)
-//         return FLT_MAX;
-
-//     t_vec3 p0l0 = ft_dotv3(pl->position, v->ray_origin, ft_subtract);
-//     float t = ft_dot(p0l0, pl->normal) / denom;
-    
-//     return (t >= 0) ? t : FLT_MAX;
-// }
-
-
 t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image, int found)
 {
 	t_vec3 directional_color;
@@ -338,9 +316,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 
 	v = ft_init_ray_values(image, coord);
 	if (ft_ray_light_intersection(image, &v, &rgb))
-	{
 		tt = *v.tt;
-	}
 	while (v.current_sp)
 	{
 		if (ft_ray_sphere_intersection(&v, &rgb))
@@ -350,9 +326,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 	while (v.current_cy)
 	{
 		if (ft_ray_cylinder_intersection(&v, &rgb, &normal))
-		{
 			v.found = 2;
-		}
 		v.current_cy = v.current_cy->next;
 	}
 	while (v.current_pl)

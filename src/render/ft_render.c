@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/01 20:55:30 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/03 19:28:06 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,18 +134,11 @@ int ft_shadow_sphere(t_image *image, t_vec3 light_dir, t_vec3 intersection_point
 #define LIGHT_RADIUS 0.5f
 #define LIGHT_COLOR (t_vec3){{1.0f, 1.0f, 1.0f}}
 
-int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
+int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb)
 {
 	t_cuadratic	values;
 
-	// image->color->light_dir.x *= -1;
-	// image->color->light_dir.y *= -1;
-	// image->color->light_dir.x *= -1;
 	t_vec3 pos = image->color->light_dir;
-
-	pos.x *= -1;
-	pos.y *= 1;
-	pos.z *= -1;
 
 	values.test = ft_dotv3((*v).ray_origin, pos, ft_subtract);
 	values.a = ft_dot((*v).ray_dir, (*v).ray_dir);
@@ -161,8 +154,6 @@ int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb, t_ve
 			*(*v).tt = values.tt;
 			*(*v).origin = values.test;
 			*rgb = (*v).current_sp->color;
-			t_vec3 intersection_point = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(*(*v).tt), ft_multiply), ft_add);
-			*normal = ft_normalice(intersection_point);
 			return (1);
 		}
 	}
@@ -346,7 +337,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 	float			tt;
 
 	v = ft_init_ray_values(image, coord);
-	if (ft_ray_light_intersection(image, &v, &rgb, &normal))
+	if (ft_ray_light_intersection(image, &v, &rgb))
 	{
 		tt = *v.tt;
 	}

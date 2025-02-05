@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/01 19:29:20 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/04 16:25:04 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,7 @@ typedef struct s_cylinder
 	t_vec3				color;
 	t_vec3				normal;
 	int					index;
+	int					type;
 	struct s_cylinder	*next;
 }						t_cylinder;
 

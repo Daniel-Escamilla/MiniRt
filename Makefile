@@ -3,7 +3,7 @@ NAME = minirt
 
 # Compilador y flags
 CC = gcc
-CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender  # -Wpedantic -Wshadow -Wformat -Wnull-dereference -Wconversion -Wstrict-overflow -Wsign-conversion -Wimplicit-fallthrough=5 -Wdouble-promotion -Wvla -Wformat-security -Wcast-align=strict -Wredundant-decls -Wlogical-op -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Winit-self -Wuninitialized -Wbad-function-cast -Wmissing-field-initializers
+CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender# -Wpedantic -Wshadow -Wformat -Wnull-dereference -Wconversion -Wstrict-overflow -Wsign-conversion -Wimplicit-fallthrough=5 -Wdouble-promotion -Wvla -Wformat-security -Wcast-align=strict -Wredundant-decls -Wlogical-op -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Winit-self -Wuninitialized -Wbad-function-cast -Wmissing-field-initializers
 
 # Directorio de fuentes
 SRC_DIR = src
@@ -11,8 +11,6 @@ SRC_DIR = src
 MAIN_SRC =      src/main/ft_main.c \
                 src/main/ft_window.c \
                 src/main/ft_initialize.c \
-
-HOOKS_SRC =		src/hooks/ft_hooks.c \
 
 RENDER_SRC =    src/render/ft_maths.c \
 				src/render/ft_dotv3.c \
@@ -22,7 +20,6 @@ RENDER_SRC =    src/render/ft_maths.c \
 
 # Archivos fuente
 SRCS = 	$(MAIN_SRC) \
-		$(HOOKS_SRC) \
 		$(RENDER_SRC) \
 
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.c=.o))
@@ -38,7 +35,7 @@ MLX_DIR = ./minilibx-linux
 MLX = $(MLX_DIR)/libmlx.a
 
 # Flags para MiniLibX
-MLX_FLAGS = -L$(MLX_DIR) -lmlx -L/usr/include/../lib -lXext -lX11 -lm
+MLX_FLAGS = -L$(MLX_DIR) -lmlx -L/usr/lib -lXext -lX11 -lm
 
 # Reglas
 all: $(OBJDIR) libft mlx $(NAME)

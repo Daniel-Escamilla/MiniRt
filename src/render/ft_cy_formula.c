@@ -6,145 +6,100 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 11:40:46 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/05 11:35:37 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/09 11:53:23 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/render.h"
 
-
-
-void	ft_init_ray_origin(t_cy_formula *values, t_vec3 ray_origin, int type)
+typedef struct s_local_coords
 {
-	if (type == 'X')
-		(*values).ray_origin.v1 = ray_origin.x;
-	if (type == 'Y')
-		(*values).ray_origin.v1 = ray_origin.y;
-	if (type == 'Z')
-		(*values).ray_origin.v1 = ray_origin.z;
-}
+	t_vec3	u;
+	t_vec3	v;
+	t_vec3	w;
+}			t_local_coords;
 
-void	ft_init_global(t_cy_formula *values, t_vec3 generic, int type, char *str)
+t_local_coords ft_create_local_coords(t_vec3 axis)
 {
-	t_vec3	*tmp;
-
-	if (ft_strncmp(str, "CYL", 3) == 0)
-		tmp = &(*values).to_cyl;
-	else if (ft_strncmp(str, "POS", 3) == 0)
-		tmp = &(*values).cy_pos;
-	else if (ft_strncmp(str, "HIT", 3) == 0)
-		tmp = &(*values).hit_point;
-	else if (ft_strncmp(str, "DIR", 3) == 0)
-		tmp = &(*values).ray_dir;
-	(*tmp).v1 = generic.x;
-	(*tmp).v2 = generic.z;
-	(*tmp).v3 = generic.y;
-	if (type == 'X')
-	{
-		(*tmp).v1 = generic.y;
-		(*tmp).v3 = generic.x;
-	}
-	if (type == 'Z')
-	{
-		(*tmp).v2 = generic.y;
-		(*tmp).v3 = generic.z;
-	}
-}
-
-void	ft_neg_axis(t_cy_formula *values, int type)
-{
-	if (type == 'X')
-		(*values).axis = ft_create_vec3(-1, 0, 0);
-	if (type == 'Y')
-		(*values).axis = ft_create_vec3(0, -1, 0);
-	if (type == 'Z')
-		(*values).axis = ft_create_vec3(0, 0, -1);
-}
-
-t_cy_formula	ft_init_cy(t_vec3 ray_origin, t_vec3 ray_dir, t_cylinder *cylinder, int type)
-{
-	t_cy_formula	values;
-	t_vec3			tmp;
-
-	tmp = ft_dotv3(ray_origin, cylinder->position, ft_subtract);
-	ft_init_ray_origin(&values, ray_origin, type);
-	ft_init_global(&values, tmp, type, "CYL");
-	ft_init_global(&values, cylinder->position, type, "POS");
-	ft_init_global(&values, ray_dir, type, "DIR");
-	values.axis = ft_normalice(cylinder->normal);
-	values.inter = ft_calloc(sizeof(int), 1);
-	*values.inter = 0;
-	return (values);
-}
-
-void	ft_cy_body(t_ray_values *r, t_cuadratic cuadratic, t_cy_formula *v, t_vec3 *rgb, t_vec3 *normal)
-{
-	t_vec3			hit_point;
-
-	cuadratic.tt = (-cuadratic.b - sqrt(cuadratic.disc)) / (2.0f * cuadratic.a);
-	if (cuadratic.tt < *r->tt && cuadratic.tt > 0.0f)
-	{
-		v->intersection = v->to_cyl.v3 + cuadratic.tt * v->ray_dir.v3;
-		float min = -r->current_cy->height / 2.0f;
-		float max = r->current_cy->height / 2.0f;
-		if (v->intersection > min && v->intersection < max)
-		{
-			*r->tt = cuadratic.tt;
-			*r->origin = ft_dotv3(r->ray_origin, ft_dotv3(r->ray_dir, ft_float_to_vec3(cuadratic.tt), ft_multiply), ft_add);
-			*v->inter = 1;
-			hit_point = *r->origin;
-			v->to_hit = ft_dotv3(hit_point, r->current_cy->position, ft_subtract);
-			ft_shadow_sphere(r->current_image, r->current_image->color->light_dir, hit_point, r->current_cy->color, rgb);
-			v->projection = ft_dotv3(v->to_hit, ft_dotv3(v->axis, ft_float_to_vec3(ft_dot(v->to_hit, v->axis)), ft_multiply), ft_subtract);
-			*normal = ft_normalice(v->projection);
-		}
-	}
-}
-
-void	ft_cy_taps(t_ray_values *r, t_cy_formula *v, t_vec3 *rgb, t_vec3 *normal, int type)
-{
-	t_vec3	hit_point;
-	float	tap;
+	t_local_coords	local;
+	t_vec3			up;
 	
-	v->tt.tap1 = (v->cy_pos.v3 - r->current_cy->height / 2.0f - v->ray_origin.v1) / v->ray_dir.v3;
-	v->tt.tap2 = (v->cy_pos.v3 + r->current_cy->height / 2.0f - v->ray_origin.v1) / v->ray_dir.v3;
-	tap = v->tt.tap1;
-	if (tap > v->tt.tap2)
-		tap = v->tt.tap2;
-	if (tap > 0.0f && tap < *r->tt)
-	{
-		hit_point = ft_dotv3(r->ray_origin, ft_dotv3(r->ray_dir, ft_float_to_vec3(tap), ft_multiply), ft_add);
-		ft_init_global(v, hit_point, type, "HIT");
-		if ((v->hit_point.v1 - v->cy_pos.v1) * (v->hit_point.v1 - v->cy_pos.v1) +
-			(v->hit_point.v2 - v->cy_pos.v2) * (v->hit_point.v2 - v->cy_pos.v2) <= r->current_cy->radius * r->current_cy->radius)
-		{
-			*r->origin = hit_point;
-			ft_shadow_sphere(r->current_image, r->current_image->color->light_dir, *r->origin, r->current_cy->color, rgb);
-			*r->tt = tap;
-			// v->axis = (t_vec3){{-0.3f, -0.5f, -0.5f}};
-			if (tap == v->tt.tap1)
-				v->axis = ft_normalice(ft_create_vec3(-0.3f, -0.5f, -0.5f));
-			// if (tap == v->tt.tap1)
-			// 	ft_neg_axis(v, type);
-			*v->inter = 1;
-			*normal = v->axis;
-		}
-	}
+	local.w = ft_normalice(axis);
+	up = (t_vec3){{0, 1, 0}};
+	if (fabs(ft_dot(local.w, up)) > 0.9999f)
+		up = (t_vec3){{1, 0, 0}};
+	local.u = ft_normalice(ft_cross(up, local.w));
+	local.v = ft_cross(local.w, local.u);
+	return (local);
 }
 
-int	ft_cylinder_formula(t_ray_values *r, t_vec3 *rgb, t_vec3 *normal, int type)
+t_vec3 ft_world_to_local(t_vec3 p, t_vec3 origin, t_local_coords local)
 {
-	t_cy_formula	v;
-	t_cuadratic		cuadratic;
+	t_vec3	tmp;
+	t_vec3	result;
 
-	v = ft_init_cy(r->ray_origin, r->ray_dir, r->current_cy, type);
-	cuadratic.a = v.ray_dir.v1 * v.ray_dir.v1 + v.ray_dir.v2 * v.ray_dir.v2;
-	cuadratic.b = 2.0f * (v.ray_dir.v1 * v.to_cyl.v1 + v.ray_dir.v2 * v.to_cyl.v2);
-	cuadratic.c = v.to_cyl.v1 * v.to_cyl.v1 + v.to_cyl.v2 * v.to_cyl.v2 - r->current_cy->radius * r->current_cy->radius;
-	cuadratic.disc = cuadratic.b * cuadratic.b - 4.0f * cuadratic.a * cuadratic.c;
-	if (cuadratic.disc >= 0.0f)
-		ft_cy_body(r, cuadratic, &v, rgb, normal);
-	if (fabs(v.ray_dir.v3) > 1e-6)
-		ft_cy_taps(r, &v, rgb, normal, type);
-	return (*v.inter);
+	tmp = ft_dotv3(p, origin, ft_subtract);
+	result.x = ft_dot(tmp, local.u);
+	result.y = ft_dot(tmp, local.v);
+	result.z = ft_dot(tmp, local.w);
+	return (result);
+}
+
+t_vec3 ft_local_to_world(t_vec3 p, t_vec3 origin, t_local_coords local)
+{
+	t_vec3 result;
+	
+	result.x = origin.x + p.x * local.u.x + p.y * local.v.x + p.z * local.w.x;
+	result.y = origin.y + p.x * local.u.y + p.y * local.v.y + p.z * local.w.y;
+	result.z = origin.z + p.x * local.u.z + p.y * local.v.z + p.z * local.w.z;
+	return (result);
+}
+
+int ft_cylinder_formula(t_ray_values *r, t_vec3 *rgb, t_vec3 *normal)
+{
+	t_cuadratic cuadratic;
+
+	t_local_coords local = ft_create_local_coords(r->current_cy->normal);
+	t_vec3 local_origin = ft_world_to_local(r->ray_origin, r->current_cy->position, local);
+	t_vec3 local_dir = ft_world_to_local(r->ray_dir, (t_vec3){{0,0,0}}, local);
+
+	cuadratic.a = local_dir.x * local_dir.x + local_dir.y * local_dir.y;
+	cuadratic.b = 2 * (local_origin.x * local_dir.x + local_origin.y * local_dir.y);
+	cuadratic.c = local_origin.x * local_origin.x + local_origin.y * local_origin.y - r->current_cy->radius * r->current_cy->radius;
+
+	cuadratic.disc = cuadratic.b * cuadratic.b - 4 * cuadratic.a * cuadratic.c;
+	if (cuadratic.disc < 0)
+		return (0);
+
+	float t1 = (-cuadratic.b - sqrt(cuadratic.disc)) / (2 * cuadratic.a);
+	float t2 = (-cuadratic.b + sqrt(cuadratic.disc)) / (2 * cuadratic.a);
+
+	cuadratic.tt = t1;
+	if (t2 < t1)
+		cuadratic.tt = t2;
+	if (cuadratic.tt < 0)
+		return (0);
+
+	t_vec3 local_hit = ft_create_vec3(local_origin.x + cuadratic.tt * local_dir.x, local_origin.y + cuadratic.tt * local_dir.y, local_origin.z + cuadratic.tt * local_dir.z);
+
+	if (fabs(local_hit.z) > r->current_cy->height / 2) {
+		cuadratic.tt = (r->current_cy->height / 2 - local_origin.z) / local_dir.z;
+		local_hit = ft_create_vec3(local_origin.x + cuadratic.tt * local_dir.x, local_origin.y + cuadratic.tt * local_dir.y, r->current_cy->height / 2);
+		if (local_hit.x * local_hit.x + local_hit.y * local_hit.y > r->current_cy->radius * r->current_cy->radius) {
+			cuadratic.tt = (-r->current_cy->height / 2 - local_origin.z) / local_dir.z;
+			local_hit = ft_create_vec3(local_origin.x + cuadratic.tt * local_dir.x, local_origin.y + cuadratic.tt * local_dir.y, -r->current_cy->height / 2);
+			if (local_hit.x * local_hit.x + local_hit.y * local_hit.y > r->current_cy->radius * r->current_cy->radius) {
+				return 0;
+			}
+		}
+	}
+	*r->origin = ft_local_to_world(local_hit, r->current_cy->position, local);
+	*r->tt = cuadratic.tt;
+	if (fabs(local_hit.z) == r->current_cy->height / 2)
+		*normal = ft_local_to_world((t_vec3){{0, 0, local_hit.z > 0 ? 1 : -1}}, (t_vec3){{0,0,0}}, local);
+	else
+		*normal = ft_local_to_world((t_vec3){{local_hit.x, local_hit.y, 0}}, (t_vec3){{0,0,0}}, local);
+	*normal = ft_normalice(*normal);
+	ft_shadow_sphere(r->current_image, r->current_image->color->light_dir, *r->origin, r->current_cy->color, rgb);
+	return (1);
 }

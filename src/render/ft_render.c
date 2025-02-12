@@ -5,12 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/18 20:28:29 by descamil          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/02/03 19:33:29 by descamil         ###   ########.fr       */
-=======
-/*   Updated: 2025/02/04 18:22:10 by descamil         ###   ########.fr       */
->>>>>>> c5122ce (Inicio de Norminette)
+/*   Created: 2025/02/05 11:45:39 by descamil          #+#    #+#             */
+/*   Updated: 2025/02/05 12:00:55 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +82,6 @@ void	ft_shadow_sphere(t_image *image, t_vec3 light_dir, t_vec3 intersection_poin
 	}
 }
 
-<<<<<<< HEAD
 // int ft_shadow_plane(t_image *image, int index, t_vec3 light_dir, t_vec3 intersection_point, t_vec3 color, t_vec3 *rgb)
 // {
 // 	t_plane *plane = &image->scene->planes[index];
@@ -148,10 +143,6 @@ int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb)
 	return (0);
 }
 
-
-
-=======
->>>>>>> c5122ce (Inicio de Norminette)
 int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 {
 	t_cuadratic	values;
@@ -176,19 +167,14 @@ int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 	}
 	return (0);
 }
-
-<<<<<<< HEAD
-int	ft_ray_cylinder_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
-{
-	if ((*v).current_cy->normal.x == 1 && (*v).current_cy->normal.y == 0 && (*v).current_cy->normal.z == 0)
-		return (ft_cylinder_formula(v, rgb, normal,'X'));
-	else if ((*v).current_cy->normal.x == 0 && (*v).current_cy->normal.y == 1 && (*v).current_cy->normal.z == 0)
-		return (ft_cylinder_formula(v, rgb, normal, 'Y'));
-	return (ft_cylinder_formula(v, rgb, normal, 'Z'));
-}
-
-=======
->>>>>>> c5122ce (Inicio de Norminette)
+// int	ft_ray_cylinder_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
+// {
+// 	if ((*v).current_cy->normal.x == 1 && (*v).current_cy->normal.y == 0 && (*v).current_cy->normal.z == 0)
+// 		return (ft_cylinder_formula(v, rgb, normal,'X'));
+// 	else if ((*v).current_cy->normal.x == 0 && (*v).current_cy->normal.y == 1 && (*v).current_cy->normal.z == 0)
+// 		return (ft_cylinder_formula(v, rgb, normal, 'Y'));
+// 	return (ft_cylinder_formula(v, rgb, normal, 'Z'));
+// }
 t_vec3 ft_cross(t_vec3 a, t_vec3 b)
 {
 	t_vec3 result;
@@ -240,11 +226,7 @@ int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 	return 1;
 }
 
-<<<<<<< HEAD
-t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image, int found)
-=======
 t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
->>>>>>> c5122ce (Inicio de Norminette)
 {
 	t_vec3	directional_color;
 	t_vec3	ambient_color;
@@ -288,7 +270,7 @@ void	ft_hit_ray(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 	}
 	while (v->current_cy)
 	{
-		if (ft_cylinder_formula(v, rgb, normal, v->current_cy->type))
+		if (ft_cylinder_formula(v, rgb, normal))
 			v->found = 2;
 		v->current_cy = v->current_cy->next;
 	}
@@ -308,30 +290,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 	t_vec3			rgb;
 
 	v = ft_init_ray_values(image, coord);
-<<<<<<< HEAD
-	if (ft_ray_light_intersection(image, &v, &rgb))
-		tt = *v.tt;
-	while (v.current_sp)
-	{
-		if (ft_ray_sphere_intersection(&v, &rgb))
-			v.found = 1;
-		v.current_sp = v.current_sp->next;
-	}
-	while (v.current_cy)
-	{
-		if (ft_ray_cylinder_intersection(&v, &rgb, &normal))
-			v.found = 2;
-		v.current_cy = v.current_cy->next;
-	}
-	while (v.current_pl)
-	{
-		if (ft_ray_plane_intersection(&v, &rgb, &normal))
-			v.found = 3;
-		v.current_pl = v.current_pl->next;
-	}
-=======
 	ft_hit_ray(&v, &rgb, &normal);
->>>>>>> c5122ce (Inicio de Norminette)
 	hit_point = ft_dotv3(*v.origin, ft_dotv3(v.ray_dir, ft_float_to_vec3(*v.tt), ft_multiply), ft_add);
 	if (v.found == 1)
 		normal = ft_normalice(hit_point);

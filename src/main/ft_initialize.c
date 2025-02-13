@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:27 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/10 16:44:55 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/13 18:31:48 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,13 @@ void	ft_initialize(t_image *image)
 	image->color->rgb.y = 0.0f;
 	image->color->rgb.z = 1.0f;
 	
-	image->ambient->ratio = 0.2;
+	image->ambient->ratio = 0.5;
 	image->ambient->rgb = ft_create_vec3(1.0f, 0.0f, 0.0f);
 
 	image->cylinder->position = ft_create_vec3(2.0f, 0.0f, 0.0f);
-	image->cylinder->radius = 0.1f;
-	image->cylinder->height = 5.0f;
-	image->cylinder->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
+	image->cylinder->radius = 1.0f;
+	image->cylinder->height = 3.0f;
+	image->cylinder->normal = ft_create_vec3(0.5f, 0.7f, -0.5f);
 	image->cylinder->color = ft_create_vec3(0.741f, 0.557f, 0.376f);
 
 	image->plane->position = ft_create_vec3(1.0f, -5.0f, 2.0f);
@@ -56,8 +56,8 @@ void	ft_initialize(t_image *image)
 	image->plane->next->next->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
 	image->plane->next->next->color = ft_create_vec3(0.0f, 1.0, 0.0f);
 
-	image->color->light_dir.x = 3.0f;
-	image->color->light_dir.y = -2.0f;
+	image->color->light_dir.x = 0.0f;
+	image->color->light_dir.y = -6.0f;
 	image->color->light_dir.z = 0.0f;
 
 	image->aspect_ratio = (float)image->width / (float)image->height;

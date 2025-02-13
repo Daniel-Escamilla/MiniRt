@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:39 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/05 12:00:55 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/13 18:28:35 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,12 +197,12 @@ float max_or_min(float value, float min, float max)
 
 int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
-	float denom;
-	float t;
-	t_vec3 p0l0;
 	t_vec3 intersection;
+	t_vec3 p0l0;
 	float distance_to_light;
 	float attenuation;
+	float denom;
+	float t;
 
 	denom = ft_dot((*v).current_pl->normal, (*v).ray_dir);
 	if (fabs(denom) < 0.000001)
@@ -221,6 +221,7 @@ int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 	t_vec3 attenuated_color = ft_dotv3(*rgb, ft_float_to_vec3(brightness), ft_multiply);
 	*rgb = attenuated_color;
 	*normal = (*v).current_pl->normal;
+	*normal = ft_normalice(*normal);
 	if (ft_dot(*normal, (*v).ray_dir) > 0)
 		*normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
 	return 1;
@@ -237,7 +238,7 @@ t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
 	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
 	d = ft_max(ft_dot(normal, light_dir), 0.0f);
 	directional_color = ft_dotv3(ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply), ft_float_to_vec3(0.1), ft_add);
-	ambient_color = ft_dotv3(rgb, ft_float_to_vec3(0.2f), ft_multiply);
+	ambient_color = ft_dotv3(rgb, ft_float_to_vec3(0.75f), ft_multiply);
 	directional_color = ft_dotv3(directional_color, ambient_color, ft_add);
 	return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
 }

@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:35:41 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 20:17:25 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:24:03 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,12 @@
 # include <X11/Xlib.h>  
 # include <X11/keysym.h>
 
-
-# include "../libft/src/libft.h"
+// MLX library
 # include "../minilibx-linux/mlx.h"
+
+// LIBFT library
+# include "../libft/src/libft.h"
+// # include "../get_next_line/get_next_line.h"
 
 # include "math_struct.h"
 # include "objects_struct.h"

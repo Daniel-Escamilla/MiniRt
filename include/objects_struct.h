@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 20:02:32 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 20:14:33 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:20:14 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,58 @@
 
 # include "../minirt.h"
 
+typedef struct s_tt
+{
+	float	tap1;
+	float	tap2;
+}			t_tt;
+
+typedef struct s_cy_formula
+{
+	t_vec3	ray_origin;
+	t_vec3	ray_dir;
+	t_vec3	cy_pos;
+	t_vec3	hit_point;
+	t_vec3	to_cyl;
+	int		*inter;
+	float	intersection;
+	int		shadow;
+	t_vec3	axis;
+	t_vec3	to_hit;
+	t_tt	tt;
+	t_vec3	projection;
+	
+}			t_cy_formula;
+
+typedef struct s_cuadratic
+{
+	float	a;
+	float	b;
+	float	c;
+	float	tt;
+	float	disc;
+	t_vec3	test;
+}			t_cuadratic;
+
+typedef struct s_color
+{
+	t_vec3		rgb;
+	t_vec3		light_dir;
+	int			plus;
+}				t_color;
+
 typedef struct	s_ambient
 {
 	float		ratio;
 	t_vec3		rgb;
 }				t_ambient;
+
+typedef struct s_camera
+{
+	t_vec3		position;
+	t_vec3		normal;
+	float		fov;
+} t_camera;
 
 typedef struct s_sphere
 { 
@@ -30,6 +77,15 @@ typedef struct s_sphere
 	int				index;
 	struct s_sphere	*next;
 }					t_sphere;
+
+typedef struct	s_plane
+{
+	t_vec3			position;
+	t_vec3			normal;
+	t_vec3			color;
+	int				index;
+	struct s_plane	*next;
+}				t_plane;
 
 typedef struct s_cylinder
 { 
@@ -42,28 +98,12 @@ typedef struct s_cylinder
 	t_vec3				color;
 }						t_cylinder;
 
-typedef struct	s_plane
-{
-	t_vec3			position;
-	t_vec3			normal;
-	t_vec3			color;
-	int				index;
-	struct s_plane	*next;
-}				t_plane;
-
 typedef struct	s_light
 {
 	int			count;
 	int			direction;
 	float		increment;
 }				t_light;
-
-typedef struct s_camera
-{
-	t_vec3		position;
-	t_vec3		normal;
-	float		fov;
-} t_camera;
 
 typedef struct s_objects
 {

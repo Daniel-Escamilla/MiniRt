@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:33:56 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 21:20:23 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:55:12 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,5 @@ typedef struct s_ray_values
 	float		*tt;
 	int			found;
 }				t_ray_values;
-
 
 #endif

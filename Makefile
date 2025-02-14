@@ -33,7 +33,7 @@ GNL_SRC =		get_next_line/get_next_line.c \
 
 MAIN_SRC =      src/main/ft_main.c \
                 src/main/ft_window.c \
-                src/main/ft_initialize_INU.c \
+                src/main/ft_initialize.c \
 
 RENDER_SRC =    src/render/ft_maths.c \
 				src/render/ft_dotv3.c \

@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:39 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/13 18:28:35 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/14 20:22:57 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	ft_shadow_sphere(t_image *image, t_vec3 light_dir, t_vec3 intersection_poin
 	light_dir = ft_normalice(light_dir);
 	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
 	*rgb = color;
-	sphere = image->sphere;
+	sphere = image->objects->sphere;
 	while (sphere != NULL)
 	{
 		values.test = ft_dotv3(intersection_point, sphere->position, ft_subtract);
@@ -136,7 +136,7 @@ int ft_ray_light_intersection(t_image *image, t_ray_values *v, t_vec3 *rgb)
 		{
 			*(*v).tt = values.tt;
 			*(*v).origin = values.test;
-			*rgb = (*v).current_sp->color;
+			*rgb = (*v).current_objects->sphere->color;
 			return (1);
 		}
 	}
@@ -147,10 +147,10 @@ int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 {
 	t_cuadratic	values;
 
-	values.test = ft_dotv3((*v).ray_origin, (*v).current_sp->position, ft_subtract);
+	values.test = ft_dotv3((*v).ray_origin, (*v).current_objects->sphere->position, ft_subtract);
 	values.a = ft_dot((*v).ray_dir, (*v).ray_dir);
 	values.b = 2.0f * ft_dot((*v).ray_dir, values.test);
-	values.c = ft_dot(values.test, values.test) - (*v).current_sp->radius * (*v).current_sp->radius;
+	values.c = ft_dot(values.test, values.test) - (*v).current_objects->sphere->radius * (*v).current_objects->sphere->radius;
 	values.disc = values.b * values.b - 4.0f * values.a * values.c;
 	if (values.disc >= 0)
 	{
@@ -159,9 +159,9 @@ int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 		{
 			*(*v).tt = values.tt;
 			*(*v).origin = values.test;
-			*rgb = (*v).current_sp->color;
+			*rgb = (*v).current_objects->sphere->color;
 			t_vec3 intersection_point = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(*(*v).tt), ft_multiply), ft_add);
-			ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection_point, (*v).current_sp->color, rgb);
+			ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection_point, (*v).current_objects->sphere->color, rgb);
 			return (1);
 		}
 	}
@@ -169,9 +169,9 @@ int ft_ray_sphere_intersection(t_ray_values *v, t_vec3 *rgb)
 }
 // int	ft_ray_cylinder_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 // {
-// 	if ((*v).current_cy->normal.x == 1 && (*v).current_cy->normal.y == 0 && (*v).current_cy->normal.z == 0)
+// 	if ((*v).current_objects->cylinder->normal.x == 1 && (*v).current_objects->cylinder->normal.y == 0 && (*v).current_objects->cylinder->normal.z == 0)
 // 		return (ft_cylinder_formula(v, rgb, normal,'X'));
-// 	else if ((*v).current_cy->normal.x == 0 && (*v).current_cy->normal.y == 1 && (*v).current_cy->normal.z == 0)
+// 	else if ((*v).current_objects->cylinder->normal.x == 0 && (*v).current_objects->cylinder->normal.y == 1 && (*v).current_objects->cylinder->normal.z == 0)
 // 		return (ft_cylinder_formula(v, rgb, normal, 'Y'));
 // 	return (ft_cylinder_formula(v, rgb, normal, 'Z'));
 // }
@@ -204,23 +204,23 @@ int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 	float denom;
 	float t;
 
-	denom = ft_dot((*v).current_pl->normal, (*v).ray_dir);
+	denom = ft_dot((*v).current_objects->plane->normal, (*v).ray_dir);
 	if (fabs(denom) < 0.000001)
 		return 0;
-	p0l0 = ft_dotv3((*v).current_pl->position, (*v).ray_origin, ft_subtract);
-	t = ft_dot(p0l0, (*v).current_pl->normal) / denom;
+	p0l0 = ft_dotv3((*v).current_objects->plane->position, (*v).ray_origin, ft_subtract);
+	t = ft_dot(p0l0, (*v).current_objects->plane->normal) / denom;
 	if (t < 0 || t > *(*v).tt)
 		return 0;
 	intersection = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
 	*(*v).tt = t;
 	*(*v).origin = intersection;
-	ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection, (*v).current_pl->color, rgb);
+	ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection, (*v).current_objects->plane->color, rgb);
 	distance_to_light = ft_length(ft_dotv3((*v).current_image->color->light_dir, intersection, ft_subtract));
 	attenuation = 1.0f / (1.0f + 1.0f * distance_to_light + 0.01f * distance_to_light * distance_to_light);
 	float brightness = max_or_min(attenuation, 0.2f, 1.0f);
 	t_vec3 attenuated_color = ft_dotv3(*rgb, ft_float_to_vec3(brightness), ft_multiply);
 	*rgb = attenuated_color;
-	*normal = (*v).current_pl->normal;
+	*normal = (*v).current_objects->plane->normal;
 	*normal = ft_normalice(*normal);
 	if (ft_dot(*normal, (*v).ray_dir) > 0)
 		*normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
@@ -252,9 +252,10 @@ t_ray_values	ft_init_ray_values(t_image *image, t_vec2 coord)
 	values.tt = ft_calloc(sizeof(float), 1);
 	*values.tt = FLT_MAX;
 	values.found = 0;
-	values.current_sp = image->sphere;
-	values.current_cy = image->cylinder;
-	values.current_pl = image->plane;
+	values.current_objects = ft_calloc(sizeof(t_objects), 1);
+	values.current_objects->sphere = image->objects->sphere;
+	values.current_objects->cylinder = image->objects->cylinder;
+	values.current_objects->plane = image->objects->plane;
 	values.current_image = image;
 	values.origin = ft_calloc(sizeof(t_vec3), 1);
 	*values.origin = ft_create_vec3(0, 0, 0);
@@ -263,23 +264,23 @@ t_ray_values	ft_init_ray_values(t_image *image, t_vec2 coord)
 
 void	ft_hit_ray(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
-	while (v->current_sp)
+	while (v->current_objects->sphere)
 	{
 		if (ft_ray_sphere_intersection(v, rgb))
 			v->found = 1;
-		v->current_sp = v->current_sp->next;
+		v->current_objects->sphere = v->current_objects->sphere->next;
 	}
-	while (v->current_cy)
+	while (v->current_objects->cylinder)
 	{
 		if (ft_cylinder_formula(v, rgb, normal))
 			v->found = 2;
-		v->current_cy = v->current_cy->next;
+		v->current_objects->cylinder = v->current_objects->cylinder->next;
 	}
-	while (v->current_pl)
+	while (v->current_objects->plane)
 	{
 		if (ft_ray_plane_intersection(v, rgb, normal))
 			v->found = 3;
-		v->current_pl = v->current_pl->next;
+		v->current_objects->plane = v->current_objects->plane->next;
 	}
 }
 

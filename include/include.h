@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:35:41 by descamil          #+#    #+#             */
-/*   Updated: 2024/10/30 17:05:18 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/14 20:17:25 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # include "../libft/src/libft.h"
 # include "../minilibx-linux/mlx.h"
 
+# include "math_struct.h"
+# include "objects_struct.h"
 # include "struct.h"
 # include "main.h"
 # include "hooks.h"

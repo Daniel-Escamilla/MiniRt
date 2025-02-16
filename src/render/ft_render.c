@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:39 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 20:22:57 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/16 16:39:21 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 	return 1;
 }
 
-t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
+t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image, int hit)
 {
 	t_vec3	directional_color;
 	t_vec3	ambient_color;
@@ -238,6 +238,8 @@ t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
 	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
 	d = ft_max(ft_dot(normal, light_dir), 0.0f);
 	directional_color = ft_dotv3(ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply), ft_float_to_vec3(0.1), ft_add);
+	if (hit == 1)
+		return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
 	ambient_color = ft_dotv3(rgb, ft_float_to_vec3(0.75f), ft_multiply);
 	directional_color = ft_dotv3(directional_color, ambient_color, ft_add);
 	return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
@@ -290,6 +292,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 	t_vec3			hit_point;
 	t_vec3			normal;
 	t_vec3			rgb;
+	int				hit;
 
 	v = ft_init_ray_values(image, coord);
 	ft_hit_ray(&v, &rgb, &normal);
@@ -300,32 +303,86 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 		return ft_float_to_vec3(0.0f);
 	free(v.tt);
 	free(v.origin);
-	return ft_calculate_lighting(normal, rgb, image);
+	hit = v.found;
+	return ft_calculate_lighting(normal, rgb, image, hit);
 }
 
-void	ft_create_render(t_mlx *data, t_image *image)
-{
-	t_vec3	color;
-	t_vec2	coord;
-	int		y;
-	int		x;
+// void	ft_create_render(t_mlx *data, t_image *image)
+// {
+// 	t_vec3	color;
+// 	t_vec2	coord;
+// 	int		y;
+// 	int		x;
 
-	y = 0;
-	while (y < image->height)
-	{
-		coord.y = ((float)y / (float)image->height) * -1 + 1;
-		coord.y = coord.y * 2.0f - 1.0f;
-		x = 0;
-		while (x < image->width)
-		{
-			coord.x = ((float)x / (float)image->width);
-			coord.x = coord.x * 2.0f - 1.0f;
-			color = ft_per_pixel(image, coord);
-			color = ft_clamp(color);
-			my_mlx_pixel_put(data, x, y, ft_convert_rgba(color));
-			x++;
-		}
-		y++;
-	}
-	mlx_put_image_to_window(image->mlx, image->mlx_win, data->img, 0, 0);
+// 	y = 0;
+// 	while (y < image->height)
+// 	{
+// 		coord.y = ((float)y / (float)image->height) * -1 + 1;
+// 		coord.y = coord.y * 2.0f - 1.0f;
+// 		x = 0;
+// 		while (x < image->width)
+// 		{
+// 			coord.x = ((float)x / (float)image->width);
+// 			coord.x = coord.x * 2.0f - 1.0f;
+// 			color = ft_per_pixel(image, coord);
+// 			color = ft_clamp(color);
+// 			my_mlx_pixel_put(data, x, y, ft_convert_rgba(color));
+// 			x++;
+// 		}
+// 		y++;
+// 	}
+// 	mlx_put_image_to_window(image->mlx, image->mlx_win, data->img, 0, 0);
+// }
+
+
+#include <pthread.h>
+
+#define NUM_THREADS 8
+
+typedef struct s_thread_data {
+    t_mlx *data;
+    t_image *image;
+    int start_y;
+    int end_y;
+} t_thread_data;
+
+void *render_chunk(void *arg) {
+    t_thread_data *thread_data = (t_thread_data *)arg;
+    t_vec3 color;
+    t_vec2 coord;
+    int y, x;
+
+    for (y = thread_data->start_y; y < thread_data->end_y; y++) {
+        coord.y = ((float)y / (float)thread_data->image->height) * -1 + 1;
+        coord.y = coord.y * 2.0f - 1.0f;
+        for (x = 0; x < thread_data->image->width; x++) {
+            coord.x = ((float)x / (float)thread_data->image->width);
+            coord.x = coord.x * 2.0f - 1.0f;
+            color = ft_per_pixel(thread_data->image, coord);
+            color = ft_clamp(color);
+            my_mlx_pixel_put(thread_data->data, x, y, ft_convert_rgba(color));
+        }
+    }
+    return NULL;
+}
+
+void ft_create_render(t_mlx *data, t_image *image) {
+    pthread_t threads[NUM_THREADS];
+    t_thread_data thread_data[NUM_THREADS];
+    int chunk_size = image->height / NUM_THREADS;
+    int i;
+
+    for (i = 0; i < NUM_THREADS; i++) {
+        thread_data[i].data = data;
+        thread_data[i].image = image;
+        thread_data[i].start_y = i * chunk_size;
+        thread_data[i].end_y = (i == NUM_THREADS - 1) ? image->height : (i + 1) * chunk_size;
+        pthread_create(&threads[i], NULL, render_chunk, (void *)&thread_data[i]);
+    }
+
+    for (i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    mlx_put_image_to_window(image->mlx, image->mlx_win, data->img, 0, 0);
 }

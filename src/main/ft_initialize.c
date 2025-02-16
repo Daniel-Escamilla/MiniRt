@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_initialize_INU.c                                :+:      :+:    :+:   */
+/*   ft_initialize.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:27 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 21:48:00 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/16 16:40:50 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,30 @@ void	ft_initialize(t_image *image)
 	image->color->rgb.y = 0.0f;
 	image->color->rgb.z = 1.0f;
 
-	image->objects->ambient->ratio = 0.5;
+	image->objects->ambient->ratio = 0.2;
 	image->objects->ambient->rgb = ft_create_vec3(1.0f, 0.0f, 0.0f);
 
-	image->objects->cylinder->position = ft_create_vec3(2.0f, 0.0f, 0.0f);
+
+	image->objects->sphere->position = ft_create_vec3(-1.0f, -1.5f, 0.0f);
+	image->objects->sphere->radius = 1.0f;
+	image->objects->sphere->color = ft_create_vec3(1.0f, 1.0f, 0.0f);
+
+	image->objects->sphere->next = ft_calloc(sizeof(t_sphere), 1);
+	image->objects->sphere->next->position = ft_create_vec3(1.0f, -1.5f, 0.0f);
+	image->objects->sphere->next->radius = 0.5f;
+	image->objects->sphere->next->color = ft_create_vec3(0.0f, 1.0f, 0.0f);
+
+	image->objects->sphere->next->next = ft_calloc(sizeof(t_sphere), 1);
+	image->objects->sphere->next->next->position = ft_create_vec3(-1.0f, 1.5f, 0.0f);
+	image->objects->sphere->next->next->radius = 0.5f;
+	image->objects->sphere->next->next->color = ft_create_vec3(0.0f, 1.0f, 1.0f);
+	
+	image->objects->sphere->next->next->next = ft_calloc(sizeof(t_sphere), 1);
+	image->objects->sphere->next->next->next->position = ft_create_vec3(1.0f, 1.5f, 0.0f);
+	image->objects->sphere->next->next->next->radius = 1.0f;
+	image->objects->sphere->next->next->next->color = ft_create_vec3(1.0f, 0.0f, 0.0f);
+
+	image->objects->cylinder->position = ft_create_vec3(0.0f, 0.0f, -5.0f);
 	image->objects->cylinder->radius = 1.0f;
 	image->objects->cylinder->height = 3.0f;
 	image->objects->cylinder->normal = ft_create_vec3(0.5f, 0.7f, -0.5f);
@@ -56,8 +76,8 @@ void	ft_initialize(t_image *image)
 	image->objects->plane->next->next->normal = ft_create_vec3(1.0f, 0.0f, 0.0f);
 	image->objects->plane->next->next->color = ft_create_vec3(0.0f, 1.0, 0.0f);
 
-	image->color->light_dir.x = 0.0f;
-	image->color->light_dir.y = -6.0f;
+	image->color->light_dir.x = 2.0f;
+	image->color->light_dir.y = -2.0f;
 	image->color->light_dir.z = 0.0f;
 
 	image->aspect_ratio = (float)image->width / (float)image->height;

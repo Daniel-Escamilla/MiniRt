@@ -1,16 +1,16 @@
 NAME = minirt
 
 CC = gcc
-CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender# -Wpedantic -Wshadow -Wformat -Wnull-dereference -Wconversion -Wstrict-overflow -Wsign-conversion -Wimplicit-fallthrough=5 -Wdouble-promotion -Wvla -Wformat-security -Wcast-align=strict -Wredundant-decls -Wlogical-op -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Winit-self -Wuninitialized -Wbad-function-cast -Wmissing-field-initializers
+CFLAGS = -g3 -Wall -Wextra -Werror -lmlx -lX11 -lXext -lXrender -pthread# -Wpedantic -Wshadow -Wformat -Wnull-dereference -Wconversion -Wstrict-overflow -Wsign-conversion -Wimplicit-fallthrough=5 -Wdouble-promotion -Wvla -Wformat-security -Wcast-align=strict -Wredundant-decls -Wlogical-op -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Winit-self -Wuninitialized -Wbad-function-cast -Wmissing-field-initializers
 
 TIDY_FLAGS = --checks="*,-clang-analyzer-alpha.*,-google-readability-braces-around-statements,-hicpp-braces-around-statements,-readability-braces-around-statements,-modernize-*,-cppcoreguidelines-*,-clang-analyzer-cplusplus.*"
 
-analyze:
-	@if [ -z "$(FILE)" ]; then \
-		echo "Por favor, especifica el archivo que quieres analizar con FILE=archivo.c"; \
-	else \
-		clang-tidy $(FILE) $(TIDY_FLAGS) -- -Iinclude -Wall -Wextra -Werror; \
-	fi
+# analyze:
+# 	@if [ -z "$(FILE)" ]; then \
+# 		echo "Por favor, especifica el archivo que quieres analizar con FILE=archivo.c"; \
+# 	else \
+# 		clang-tidy $(FILE) $(TIDY_FLAGS) -- -Iinclude -Wall -Wextra -Werror; \
+# 	fi
 
 SRC_DIR = src
 OBJDIR = $(NAME)_objects

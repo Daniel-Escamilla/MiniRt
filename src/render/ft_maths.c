@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 11:30:45 by descamil          #+#    #+#             */
-/*   Updated: 2025/01/24 11:54:39 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/16 16:47:23 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,14 @@ t_vec3	ft_clamp(t_vec3 color)
 		color.x = 0.0f;
 	else if (color.x > 1.0f)
 		color.x = 1.0f;
-
 	if (color.y < 0.0f)
 		color.y = 0.0f;
 	else if (color.y > 1.0f)
 		color.y = 1.0f;
-
 	if (color.z < 0.0f)
 		color.z = 0.0f;
 	else if (color.z > 1.0f)
 		color.z = 1.0f;
-
 	return (color);
 }
 
@@ -69,11 +66,9 @@ t_vec3	ft_normalice(t_vec3 vec)
 
 	if (magnitud == 0.0f)
 		return (vec);
-
 	vec.x /= magnitud;
 	vec.y /= magnitud;
 	vec.z /= magnitud;
-
 	return (vec);
 }
 

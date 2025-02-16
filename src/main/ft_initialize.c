@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:27 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/16 16:40:50 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/16 16:47:11 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ void	ft_initialize(t_image *image)
 	image->objects->ambient->ratio = 0.2;
 	image->objects->ambient->rgb = ft_create_vec3(1.0f, 0.0f, 0.0f);
 
-
 	image->objects->sphere->position = ft_create_vec3(-1.0f, -1.5f, 0.0f);
 	image->objects->sphere->radius = 1.0f;
 	image->objects->sphere->color = ft_create_vec3(1.0f, 1.0f, 0.0f);
@@ -50,7 +49,7 @@ void	ft_initialize(t_image *image)
 	image->objects->sphere->next->next->position = ft_create_vec3(-1.0f, 1.5f, 0.0f);
 	image->objects->sphere->next->next->radius = 0.5f;
 	image->objects->sphere->next->next->color = ft_create_vec3(0.0f, 1.0f, 1.0f);
-	
+
 	image->objects->sphere->next->next->next = ft_calloc(sizeof(t_sphere), 1);
 	image->objects->sphere->next->next->next->position = ft_create_vec3(1.0f, 1.5f, 0.0f);
 	image->objects->sphere->next->next->next->radius = 1.0f;

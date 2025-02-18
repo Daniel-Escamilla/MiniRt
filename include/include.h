@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 19:35:41 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/14 21:51:40 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/18 16:39:14 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include "objects_struct.h"
 # include "struct.h"
 # include "main.h"
+# include "colors.h"
 
 # include "hooks.h"
 # include "render.h"

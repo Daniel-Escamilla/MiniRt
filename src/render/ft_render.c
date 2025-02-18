@@ -6,7 +6,7 @@
 /*   By: descamil <descamil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:45:39 by descamil          #+#    #+#             */
-/*   Updated: 2025/02/16 16:39:21 by descamil         ###   ########.fr       */
+/*   Updated: 2025/02/18 19:30:08 by descamil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,53 +197,132 @@ float max_or_min(float value, float min, float max)
 
 int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
 {
-	t_vec3 intersection;
-	t_vec3 p0l0;
-	float distance_to_light;
-	float attenuation;
-	float denom;
-	float t;
+    t_vec3 intersection;
+    t_vec3 p0l0;
+    t_vec3 light_dir;
+    float denom;
+    float t;
 
-	denom = ft_dot((*v).current_objects->plane->normal, (*v).ray_dir);
-	if (fabs(denom) < 0.000001)
-		return 0;
-	p0l0 = ft_dotv3((*v).current_objects->plane->position, (*v).ray_origin, ft_subtract);
-	t = ft_dot(p0l0, (*v).current_objects->plane->normal) / denom;
-	if (t < 0 || t > *(*v).tt)
-		return 0;
-	intersection = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
-	*(*v).tt = t;
-	*(*v).origin = intersection;
-	ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection, (*v).current_objects->plane->color, rgb);
-	distance_to_light = ft_length(ft_dotv3((*v).current_image->color->light_dir, intersection, ft_subtract));
-	attenuation = 1.0f / (1.0f + 1.0f * distance_to_light + 0.01f * distance_to_light * distance_to_light);
-	float brightness = max_or_min(attenuation, 0.2f, 1.0f);
-	t_vec3 attenuated_color = ft_dotv3(*rgb, ft_float_to_vec3(brightness), ft_multiply);
-	*rgb = attenuated_color;
-	*normal = (*v).current_objects->plane->normal;
-	*normal = ft_normalice(*normal);
-	if (ft_dot(*normal, (*v).ray_dir) > 0)
-		*normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
-	return 1;
+    // Cálculo de la intersección
+    denom = ft_dot((*v).current_objects->plane->normal, (*v).ray_dir);
+    if (fabs(denom) < 0.000001)
+        return 0;
+    p0l0 = ft_dotv3((*v).current_objects->plane->position, (*v).ray_origin, ft_subtract);
+    t = ft_dot(p0l0, (*v).current_objects->plane->normal) / denom;
+    if (t < 0 || t > *(*v).tt)
+        return 0;
+
+    // Punto de intersección
+    intersection = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
+    *(*v).tt = t;
+    *(*v).origin = intersection;
+
+    ft_shadow_sphere((*v).current_image, light_dir, intersection, (*v).current_objects->plane->color, rgb);
+    // Cálculo de la normal
+    *normal = (*v).current_objects->plane->normal;
+    *normal = ft_normalice(*normal);
+    if (ft_dot(*normal, (*v).ray_dir) > 0)
+        *normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
+
+    // Dirección de la luz desde el punto de intersección
+    light_dir = ft_normalice(ft_dotv3((*v).current_image->color->light_dir, intersection, ft_subtract));
+
+    // Comprueba si la luz está en el mismo lado que la normal del plano
+    float light_dot = ft_dot(*normal, light_dir);
+    
+    if (light_dot > 0)
+    {
+        // La luz está en el lado correcto, calcula la iluminación
+        float light_intensity = light_dot;
+        
+        // Aplica sombras si es necesario
+        
+        // Aplica la intensidad de la luz
+        *rgb = ft_dotv3(*rgb, ft_float_to_vec3(light_intensity), ft_multiply);
+    }
+    else
+    {
+        // La luz está en el lado opuesto, el plano está en sombra
+        *rgb = ft_float_to_vec3(0.0f);  // Negro
+    }
+
+    return 1;
 }
 
-t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image, int hit)
+
+
+// int ft_ray_plane_intersection(t_ray_values *v, t_vec3 *rgb, t_vec3 *normal)
+// {
+// 	t_vec3 intersection;
+// 	t_vec3 p0l0;
+// 	float distance_to_light;
+// 	float attenuation;
+// 	float denom;
+// 	float t;
+
+// 	denom = ft_dot((*v).current_objects->plane->normal, (*v).ray_dir);
+// 	if (fabs(denom) < 0.000001)
+// 		return 0;
+// 	p0l0 = ft_dotv3((*v).current_objects->plane->position, (*v).ray_origin, ft_subtract);
+// 	t = ft_dot(p0l0, (*v).current_objects->plane->normal) / denom;
+// 	if (t < 0 || t > *(*v).tt)
+// 		return 0;
+// 	intersection = ft_dotv3((*v).ray_origin, ft_dotv3((*v).ray_dir, ft_float_to_vec3(t), ft_multiply), ft_add);
+// 	*(*v).tt = t;
+// 	*(*v).origin = intersection;
+// 	ft_shadow_sphere((*v).current_image, (*v).current_image->color->light_dir, intersection, (*v).current_objects->plane->color, rgb);
+// 	distance_to_light = ft_length(ft_dotv3((*v).current_image->color->light_dir, intersection, ft_subtract));
+// 	attenuation = 1.0f / (1.0f + 1.0f * distance_to_light + 0.01f * distance_to_light * distance_to_light);
+// 	float brightness = max_or_min(attenuation, 0.2f, 1.0f);
+// 	t_vec3 attenuated_color = ft_dotv3(*rgb, ft_float_to_vec3(brightness), ft_multiply);
+// 	*rgb = attenuated_color;
+// 	*normal = (*v).current_objects->plane->normal;
+// 	*normal = ft_normalice(*normal);
+// 	if (ft_dot(*normal, (*v).ray_dir) > 0)
+// 		*normal = ft_dotv3(*normal, ft_float_to_vec3(-1), ft_multiply);
+// 	return 1;
+// }
+
+// t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
+// {
+// 	t_vec3	directional_color;
+// 	t_vec3	ambient_color;
+// 	t_vec3	light_dir;
+// 	float	d;
+
+// 	light_dir = ft_normalice(image->color->light_dir);
+// 	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
+// 	d = ft_max(ft_dot(normal, light_dir), 0.0f);
+// 	directional_color = ft_dotv3(ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply), ft_float_to_vec3(0.1), ft_add);
+// 		// return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
+// 	ambient_color = ft_dotv3(rgb, ft_float_to_vec3(0.2f), ft_multiply);
+// 	directional_color = ft_dotv3(directional_color, ambient_color, ft_add);
+// 	return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
+// }
+
+t_vec3 ft_calculate_lighting(t_vec3 normal, t_vec3 rgb, t_image *image)
 {
-	t_vec3	directional_color;
-	t_vec3	ambient_color;
-	t_vec3	light_dir;
-	float	d;
+    t_vec3 directional_color;
+    t_vec3 ambient_color;
+    t_vec3 light_dir;
+    float d;
+    float ambient_intensity = 0.2f;
+    float directional_intensity = 0.9f;
 
-	light_dir = ft_normalice(image->color->light_dir);
-	light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
-	d = ft_max(ft_dot(normal, light_dir), 0.0f);
-	directional_color = ft_dotv3(ft_dotv3(rgb, ft_float_to_vec3(d), ft_multiply), ft_float_to_vec3(0.1), ft_add);
-	if (hit == 1)
-		return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
-	ambient_color = ft_dotv3(rgb, ft_float_to_vec3(0.75f), ft_multiply);
-	directional_color = ft_dotv3(directional_color, ambient_color, ft_add);
-	return ft_dotv3(directional_color, ft_float_to_vec3(1.0f), ft_multiply);
+    // Cálculo de la luz direccional
+    light_dir = ft_normalice(image->color->light_dir);
+    light_dir = ft_dotv3(light_dir, ft_float_to_vec3(-1), ft_multiply);
+    d = ft_max(ft_dot(normal, light_dir), 0.0f);
+    directional_color = ft_dotv3(rgb, ft_float_to_vec3(d * directional_intensity), ft_multiply);
+
+    // Cálculo de la luz ambiental
+    ambient_color = ft_dotv3(rgb, ft_float_to_vec3(ambient_intensity), ft_multiply);
+
+    // Combinación de luz direccional y ambiental
+    t_vec3 final_color = ft_dotv3(directional_color, ambient_color, ft_add);
+    return ft_clamp(final_color);
 }
+
 
 t_ray_values	ft_init_ray_values(t_image *image, t_vec2 coord)
 {
@@ -292,7 +371,6 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 	t_vec3			hit_point;
 	t_vec3			normal;
 	t_vec3			rgb;
-	int				hit;
 
 	v = ft_init_ray_values(image, coord);
 	ft_hit_ray(&v, &rgb, &normal);
@@ -303,8 +381,7 @@ t_vec3 ft_per_pixel(t_image *image, t_vec2 coord)
 		return ft_float_to_vec3(0.0f);
 	free(v.tt);
 	free(v.origin);
-	hit = v.found;
-	return ft_calculate_lighting(normal, rgb, image, hit);
+	return ft_calculate_lighting(normal, rgb, image);
 }
 
 // void	ft_create_render(t_mlx *data, t_image *image)
